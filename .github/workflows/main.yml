@@ -32,11 +32,13 @@ jobs:
       run: cordova create nms-app com.nmstrading.app "NMS Trading"
     - name: Copy files
       run: |
-        mkdir -p nms-app/www
+        mkdir -p nms-app/www/js
         cp index.html nms-app/www/
-        cp app.js nms-app/www/
         cp style.css nms-app/www/
         cp config.xml nms-app/
+        cp -r js/*.js nms-app/www/js/
+        ls -la nms-app/www/ || echo "Copied files not found"
+        ls -la nms-app/www/js/ || echo "JS files not found"
     - name: Add Android platform
       working-directory: ./nms-app
       run: |
