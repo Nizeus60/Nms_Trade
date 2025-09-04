@@ -12,13 +12,25 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
 
+    - name: Install dependencies
+      run: npm install  # Si tu as un package.json, sinon commente
+
     - name: Install Cordova
-      run: npm install -g cordova
+      run: npm install -g cordova@12.0.0
 
     - name: Clean old Cordova project
       run: rm -rf nms-app
@@ -26,11 +38,13 @@ jobs:
     - name: Create Cordova project
       run: cordova create nms-app com.nmstrading.app "NMS Trading"
 
-    - name: Copy all www files
-      run: cp -R ./www/* nms-app/www/
-
-    - name: Copy config.xml
-      run: cp config.xml nms-app/
+    - name: Copy files
+      run: |
+        mkdir -p nms-app/www
+        cp index.html nms-app/www/
+        cp app.js nms-app/www/
+        cp style.css nms-app/www/
+        cp config.xml nms-app/
 
     - name: Add Android platform
       working-directory: ./nms-app
@@ -42,8 +56,20 @@ jobs:
       working-directory: ./nms-app
       run: cordova build android --release
 
+    - name: Sign APK (optional for test - configure secrets)
+      if: false  # Active pour production
+      working-directory: ./nms-app
+      env:
+        KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      run: |
+        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $KEYSTORE_PATH -storepass $KEYSTORE_PASSWORD -keypass $KEY_PASSWORD platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk $KEY_ALIAS
+        zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk platforms/android/app/build/outputs/apk/release/app-release.apk
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: nms-trading-apk
-        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk  # Ou app-release.apk si signé
