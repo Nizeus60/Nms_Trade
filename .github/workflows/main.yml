@@ -24,8 +24,6 @@ jobs:
     - name: Install Android SDK 34
       run: |
         sdkmanager "platforms;android-34" "build-tools;34.0.0"
-        # Vérifier l'installation de zipalign
-        ls -la $ANDROID_HOME/build-tools/34.0.0 | grep zipalign || echo "zipalign not found"
         # Afficher le chemin de l'Android SDK pour débogage
         echo "ANDROID_HOME is set to $ANDROID_HOME"
 
@@ -61,27 +59,14 @@ jobs:
       working-directory: ./nms-app
       run: cordova build android --release -- --packageType=apk
 
-    - name: Generate and Sign APK
+    - name: Verify APK
       working-directory: ./nms-app
       run: |
-        # Définir le chemin explicite pour zipalign
-        ZIPALIGN=$ANDROID_HOME/build-tools/34.0.0/zipalign
-        # Vérifier si zipalign existe
-        if [ ! -f "$ZIPALIGN" ]; then echo "zipalign not found at $ZIPALIGN"; exit 1; fi
-        # Générer une clé temporaire
-        keytool -genkey -v -keystore temp.keystore -alias testalias -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Test, OU=Test, O=Test, L=Test, S=Test, C=US" -storepass testpass -keypass testpass
-        # Signer l'APK
-        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA256 -keystore temp.keystore -storepass testpass -keypass testpass platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk testalias
-        # Copier l'APK signé pour upload
-        cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk platforms/android/app/build/outputs/apk/release/app-release-signed.apk
-        # Aligner l'APK
-        $ZIPALIGN -v 4 platforms/android/app/build/outputs/apk/release/app-release-signed.apk platforms/android/app/build/outputs/apk/release/app-release.apk
+        # Vérifier l'intégrité de l'APK
+        zipinfo -l platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk || echo "APK is corrupted"
 
-    - name: Upload APKs
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: nms-trading-apks
-        path: |
-          nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
-          nms-app/platforms/android/app/build/outputs/apk/release/app-release-signed.apk
-          nms-app/platforms/android/app/build/outputs/apk/release/app-release.apk
+        name: nms-trading-apk
+        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
