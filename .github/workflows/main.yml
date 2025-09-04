@@ -1,56 +1,49 @@
-name: Build NMS Trading APK
+name: Build APK
 
 on:
   push:
-    branches: [ main ]   # ou la branche que tu utilises
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Récupérer le code
-    - uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v4
 
-    # 2️⃣ Installer Node.js
-    - uses: actions/setup-node@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
 
-    # 3️⃣ Installer Cordova globalement
     - name: Install Cordova
       run: npm install -g cordova
 
-    # 4️⃣ Installer plugins nécessaires (ex: AdMob)
-    - name: Install Cordova plugins
-      run: |
-        npm install -g cordova-plugin-admob-free
-        # ajouter d'autres plugins si besoin
-        # ex: cordova plugin add cordova-plugin-device
+    - name: Clean old Cordova project
+      run: rm -rf nms-app
 
-    # 5️⃣ Créer le projet Cordova si inexistant
     - name: Create Cordova project
-      run: |
-        if [ ! -d "nms-app" ]; then
-          cordova create nms-app com.nmstrading.app "NMS Trading"
-        fi
+      run: cordova create nms-app com.nmstrading.app "NMS Trading"
 
-    # 6️⃣ Copier tous les fichiers du projet dans www
-    - name: Copy project files
-      run: |
-        cp -r index.html style.css app.js assets nms-app/www/
-        cp config.xml nms-app/
+    - name: Copy all www files
+      run: cp -R ./www/* nms-app/www/
 
-    # 7️⃣ Ajouter la plateforme Android et construire l'APK
-    - name: Build Android APK
+    - name: Copy config.xml
+      run: cp config.xml nms-app/
+
+    - name: Add Android platform
       working-directory: ./nms-app
       run: |
-        cordova platform add android || echo "Platform already added"
-        cordova build android --debug
+        cordova platform add android
+        cordova prepare android
 
-    # 8️⃣ Upload de l'APK généré comme artefact
+    - name: Build Android APK
+      working-directory: ./nms-app
+      run: cordova build android --release
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: nms-trading-apk
-        path: nms-app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
