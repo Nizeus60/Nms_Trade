@@ -1,5 +1,44 @@
-<!DOCTYPE html>
-<html lang="fr">
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,121 +46,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="stars" class="stars"></div>
     <div class="container">
-        <div class="header">
-            <h1>✦ COMMERCE GALACTIQUE ✦</h1>
-            <div class="lang-switch">
-                <button class="lang-btn active" data-lang="fr" aria-label="Français">🇫🇷 FR</button>
-                <button class="lang-btn" data-lang="en" aria-label="English">🇬🇧 EN</button>
-            </div>
+        <h1>No Man's Sky Trading Tool</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search for trade items..." autocomplete="off">
+            <div id="suggestions" class="suggestions"></div>
         </div>
-
-        <!-- Section Recherche -->
-        <div class="page-section" id="search" style="display: block;">
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Rechercher un produit...">
-                <button class="search-btn" id="searchBtn" onclick="searchProduct(document.getElementById('searchInput').value)">🔍 Chercher</button>
-            </div>
-            <div id="resultsList"></div> <!-- Conteneur pour les résultats de recherche -->
-            <div class="suggestions" id="suggestions"></div>
-        </div>
-
-        <!-- Section Systèmes -->
-        <div class="page-section" id="systems">
-            <h2>📡 Mes Systèmes Sauvegardés</h2>
-            <button class="primary-btn" id="addSystemBtn" onclick="showAddSystemForm()">➕ Ajouter un système</button>
-            <div id="systemsList" class="systems-list"></div>
-        </div>
-
-        <!-- Formulaire d'ajout de système (caché par défaut) -->
-        <div class="page-section system-form" id="add-system" style="display: none;">
-            <h2>➕ Nouveau Système</h2>
-            <form id="systemForm">
-                <div class="form-group">
-                    <label for="systemName">Nom du système:</label>
-                    <input type="text" id="systemName">
-                </div>
-                <div class="form-group">
-                    <label for="economyType">Type d'économie:</label>
-                    <select id="economyType">
-                        <option value="">Sélectionner...</option>
-                        <option value="trading">Marchande/Trading</option>
-                        <option value="manufacturing">Fabrication/Manufacturing</option>
-                        <option value="technology">High-tech/Technology</option>
-                        <option value="power">Génération d'énergie/Power</option>
-                        <option value="mining">Minière/Mining</option>
-                        <option value="scientific">Scientifique/Scientific</option>
-                        <option value="materials">Alliages avancés/Materials</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="coordinates">Coordonnées:</label>
-                    <input type="text" id="coordinates">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="buyPercent">% Achat:</label>
-                        <input type="number" id="buyPercent">
-                    </div>
-                    <div class="form-group">
-                        <label for="sellPercent">% Vente:</label>
-                        <input type="number" id="sellPercent">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="notes">Notes:</label>
-                    <textarea id="notes"></textarea>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="secondary-btn" onclick="hideAddSystemForm()">Annuler</button>
-                    <button type="button" class="primary-btn" id="saveSystemBtn" onclick="saveSystem()">💾 Sauvegarder</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Section Comparateur -->
-        <div class="page-section" id="comparator">
-            <h2>📊 Comparateur de Systèmes</h2>
-            <div class="search-container">
-                <input type="text" id="productSearchInput" placeholder="Chercher un produit...">
-                <button class="search-btn" id="searchProductBtn" onclick="compareSystems(document.getElementById('productSearchInput').value)">🔍 Chercher</button>
-            </div>
-            <div id="comparatorResults"></div> <!-- Conteneur pour les résultats de comparaison -->
-        </div>
-
-        <!-- Section Ressources (nouvel onglet) -->
-        <div class="page-section" id="resources">
-            <h2>📚 Ressources</h2>
-            <div class="search-container">
-                <input type="text" id="resourceSearchInput" placeholder="Rechercher une ressource...">
-                <button class="search-btn" id="searchResourceBtn" onclick="searchResource(document.getElementById('resourceSearchInput').value)">🔍 Chercher</button>
-            </div>
-            <div id="resourcesList"></div> <!-- Conteneur pour la liste des ressources -->
-        </div>
+        <div id="results" class="results"></div>
     </div>
-
-    <!-- Navigation inférieure -->
-    <div class="bottom-nav">
-        <button class="nav-btn active" data-section="search">
-            <span class="nav-icon">🔍</span>
-            <span class="nav-label">Recherche</span>
-        </button>
-        <button class="nav-btn" data-section="systems">
-            <span class="nav-icon">📡</span>
-            <span class="nav-label">Systèmes</span>
-        </button>
-        <button class="nav-btn" data-section="comparator">
-            <span class="nav-icon">📊</span>
-            <span class="nav-label">Comparer</span>
-        </button>
-        <button class="nav-btn" data-section="resources">
-            <span class="nav-icon">📚</span>
-            <span class="nav-label">Ressources</span>
-        </button>
-    </div>
-
-    <script src="cordova.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
