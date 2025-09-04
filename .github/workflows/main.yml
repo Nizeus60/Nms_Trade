@@ -55,7 +55,7 @@ jobs:
 
     - name: Build Android APK
       working-directory: ./nms-app
-      run: cordova build android --release
+      run: cordova build android --release -- --packageType=apk
 
     - name: Sign APK (optional for test - configure secrets)
       if: false  # Active pour production
