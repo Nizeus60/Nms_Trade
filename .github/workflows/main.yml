@@ -21,6 +21,10 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Install Android SDK 34
+      run: |
+        sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -69,4 +73,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: nms-trading-apk
-        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk  # Ou app-release.apk si signé
+        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
