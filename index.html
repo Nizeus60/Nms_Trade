@@ -38,7 +38,7 @@
         return gk_fileData[filename] || "";
         }
         </script><!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,14 +46,112 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="stars"></div>
     <div class="container">
-        <h1>No Man's Sky Trading Tool</h1>
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search for trade items..." autocomplete="off">
-            <div id="suggestions" class="suggestions"></div>
+        <div class="header">
+            <h1 id="appTitle">✦ COMMERCE GALACTIQUE ✦</h1>
+            <div class="lang-switch">
+                <button class="lang-btn" data-lang="fr">🇫🇷 FR</button>
+                <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+            </div>
         </div>
-        <div id="results" class="results"></div>
+
+        <div id="searchSection" class="section active">
+            <div class="search-container">
+                <div id="productSuggestions" class="suggestions"></div>
+                <input type="text" id="productSearch" placeholder="Rechercher un produit...">
+                <button id="searchProductBtn">🔍 Chercher</button>
+            </div>
+            <div id="resultsList"></div>
+        </div>
+
+        <div id="systemsSection" class="section">
+            <h2 id="systemsTitle">📡 Mes Systèmes Sauvegardés</h2>
+            <button id="addSystemBtn">➕ Ajouter un système</button>
+            <div id="systemsList"></div>
+        </div>
+
+        <div id="addSystemSection" class="section">
+            <h2 id="addSystemTitle">➕ Nouveau Système</h2>
+            <div class="form-row">
+                <label for="systemName">Nom du système:</label>
+                <input type="text" id="systemName">
+            </div>
+            <div class="form-row">
+                <label for="economyType">Type d'économie:</label>
+                <select id="economyType">
+                    <option value="">Sélectionner...</option>
+                    <option value="trading">Marchande/Trading</option>
+                    <option value="manufacturing">Fabrication/Manufacturing</option>
+                    <option value="technology">High-tech/Technology</option>
+                    <option value="power">Génération d'énergie/Power</option>
+                    <option value="mining">Minière/Mining</option>
+                    <option value="scientific">Scientifique/Scientific</option>
+                    <option value="materials">Alliages avancés/Materials</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="coordinates">Coordonnées:</label>
+                <input type="text" id="coordinates">
+            </div>
+            <div class="form-row form-row-double">
+                <div>
+                    <label for="buyPercent">% Achat:</label>
+                    <input type="number" id="buyPercent" min="-100" max="100">
+                </div>
+                <div>
+                    <label for="sellPercent">% Vente:</label>
+                    <input type="number" id="sellPercent" min="-100" max="100">
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="notes">Notes:</label>
+                <textarea id="notes"></textarea>
+            </div>
+            <div class="form-row">
+                <button id="cancelSystemBtn">Annuler</button>
+                <button id="saveSystemBtn">💾 Sauvegarder</button>
+            </div>
+        </div>
+
+        <div id="comparatorSection" class="section">
+            <h2 id="comparatorTitle">📊 Comparateur de Systèmes</h2>
+            <div class="search-container">
+                <input type="text" id="comparatorSearch" placeholder="Chercher un produit...">
+                <button id="searchComparatorBtn">🔍 Chercher</button>
+            </div>
+            <div id="comparatorResults"></div>
+        </div>
+
+        <div id="resourcesSection" class="section">
+            <h2 id="resourcesTitle">📚 Ressources</h2>
+            <div class="search-container">
+                <input type="text" id="resourceSearch" placeholder="Rechercher une ressource...">
+                <button id="searchResourceBtn">🔍 Chercher</button>
+            </div>
+            <div id="resourcesList"></div>
+        </div>
     </div>
+
+    <div class="bottom-nav">
+        <button class="nav-btn active" data-section="searchSection">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">Recherche</span>
+        </button>
+        <button class="nav-btn" data-section="systemsSection">
+            <span class="nav-icon">📡</span>
+            <span class="nav-label">Systèmes</span>
+        </button>
+        <button class="nav-btn" data-section="comparatorSection">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Comparer</span>
+        </button>
+        <button class="nav-btn" data-section="resourcesSection">
+            <span class="nav-icon">📚</span>
+            <span class="nav-label">Ressources</span>
+        </button>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
