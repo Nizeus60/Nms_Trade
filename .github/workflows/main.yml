@@ -24,6 +24,10 @@ jobs:
     - name: Install Android SDK 34
       run: |
         sdkmanager "platforms;android-34" "build-tools;34.0.0"
+        # Vérifier l'installation de zipalign
+        ls -la $ANDROID_HOME/build-tools/34.0.0 | grep zipalign || echo "zipalign not found"
+        # Afficher le chemin de l'Android SDK pour débogage
+        echo "ANDROID_HOME is set to $ANDROID_HOME"
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -60,16 +64,26 @@ jobs:
     - name: Generate and Sign APK
       working-directory: ./nms-app
       run: |
-        export PATH=$PATH:$ANDROID_SDK_ROOT/build-tools/34.0.0
-        # Generate a temporary keystore for testing
+        # Définir le chemin explicite pour zipalign
+        ZIPALIGN=$ANDROID_HOME/build-tools/34.0.0/zipalign
+        # Vérifier si zipalign existe
+        if [ ! -f "$ZIPALIGN" ]; then echo "zipalign not found at $ZIPALIGN"; exit 1; fi
+        # Générer une clé temporaire
         keytool -genkey -v -keystore temp.keystore -alias testalias -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Test, OU=Test, O=Test, L=Test, S=Test, C=US" -storepass testpass -keypass testpass
-        # Sign the APK
+        # Copier l'APK non signé pour upload
+        cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        # Signer l'APK
         jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA256 -keystore temp.keystore -storepass testpass -keypass testpass platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk testalias
-        # Align the APK
-        zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk platforms/android/app/build/outputs/apk/release/app-release.apk
+        # Copier l'APK signé pour upload
+        cp platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk platforms/android/app/build/outputs/apk/release/app-release-signed.apk
+        # Aligner l'APK
+        $ZIPALIGN -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk platforms/android/app/build/outputs/apk/release/app-release.apk
 
-    - name: Upload APK
+    - name: Upload APKs
       uses: actions/upload-artifact@v4
       with:
-        name: nms-trading-apk
-        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release.apk
+        name: nms-trading-apks
+        path: |
+          nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
+          nms-app/platforms/android/app/build/outputs/apk/release/app-release-signed.apk
+          nms-app/platforms/android/app/build/outputs/apk/release/app-release.apk
