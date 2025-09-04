@@ -60,10 +60,11 @@ jobs:
     - name: Generate and Sign APK
       working-directory: ./nms-app
       run: |
+        export PATH=$PATH:$ANDROID_SDK_ROOT/build-tools/34.0.0
         # Generate a temporary keystore for testing
         keytool -genkey -v -keystore temp.keystore -alias testalias -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Test, OU=Test, O=Test, L=Test, S=Test, C=US" -storepass testpass -keypass testpass
         # Sign the APK
-        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore temp.keystore -storepass testpass -keypass testpass platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk testalias
+        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA256 -keystore temp.keystore -storepass testpass -keypass testpass platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk testalias
         # Align the APK
         zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk platforms/android/app/build/outputs/apk/release/app-release.apk
 
