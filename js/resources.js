@@ -2,15 +2,15 @@ console.log('resources.js loaded');
 window.resources = {
     "Graviton Orb|Orbe de gravitino": { type: "Ressource rare", avgPrice: 12000, sellTo: ["Scientific"] },
     "Pure Ferrite|Ferrite pure": { type: "Minéral", avgPrice: 28, sellTo: ["Manufacturing"] },
-    "Ammonia|Ammoniac": { type: "Minéral", avgPrice: 62, sellTo: ["Mining"] },
-    "Dioxite|Dioxite": { type: "Minéral", avgPrice: 62, sellTo: ["Power Generation"] },
-    "Sodium Nitrate|Nitrate de sodium": { type: "Minéral", avgPrice: 89, sellTo: ["Power Generation"] },
+    "Ammonia|Ammoniac": { type: "Gaz", avgPrice: 62, sellTo: ["Mining"] },
+    "Dioxite|Dioxite": { type: "Gaz", avgPrice: 62, sellTo: ["Power Generation"] },
+    "Sodium Nitrate|Nitrate de sodium": { type: "Gaz", avgPrice: 89, sellTo: ["Power Generation"] },
     "Ionised Cobalt|Cobalt ionisé": { type: "Minéral", avgPrice: 401, sellTo: ["Technology"] },
     "Activated Copper|Cuivre activé": { type: "Minéral", avgPrice: 245, sellTo: ["Manufacturing"] },
     "Phosphorus|Phosphore": { type: "Minéral", avgPrice: 33, sellTo: ["Manufacturing"] },
     "Paraffinium|Paraffinium": { type: "Minéral", avgPrice: 28, sellTo: ["Manufacturing"] },
     "Pyrite|Pyrite": { type: "Minéral", avgPrice: 62, sellTo: ["Manufacturing"] },
-    "Uranium|Uranium": { type: "Minéral", avgPrice: 85, sellTo: ["Power Generation"] },
+    "Uranium|Uranium": { type: "Gaz", avgPrice: 85, sellTo: ["Power Generation"] },
     "Emeril|Emeril": { type: "Minéral", avgPrice: 245, sellTo: ["Technology"] },
     "Gold|Or": { type: "Minéral", avgPrice: 288, sellTo: ["Technology"] },
     "Silver|Argent": { type: "Minéral", avgPrice: 115, sellTo: ["Manufacturing"] },
@@ -22,7 +22,17 @@ window.resources = {
     "Sulphurine|Sulfurine": { type: "Gaz", avgPrice: 14, sellTo: ["Power Generation"] },
     "Radon|Radon": { type: "Gaz", avgPrice: 160, sellTo: ["Technology"] },
     "Liquid Explosive|Explosif liquide": { type: "Produit chimique", avgPrice: 678, sellTo: ["Mining"] },
-    "Cryogenic Pump|Pompe cryogénique": { type: "Produit chimique", avgPrice: 389, sellTo: ["Power Generation"] }
+    "Cryogenic Pump|Pompe cryogénique": { type: "Produit chimique", avgPrice: 389, sellTo: ["Power Generation"] },
+    "Magnetised Ferrite|Ferrite magnétisée": { type: "Minéral", avgPrice: 100, sellTo: ["Manufacturing"] },
+    "Frost Crystal|Cristal de givre": { type: "Ressource rare", avgPrice: 300, sellTo: ["Scientific"] },
+    "Solanium|Solanium": { type: "Gaz", avgPrice: 75, sellTo: ["Power Generation"] },
+    "Cactus Flesh|Chair de cactus": { type: "Plante", avgPrice: 50, sellTo: ["Manufacturing"] },
+    "Star Bulb|Bulbe stellaire": { type: "Plante", avgPrice: 200, sellTo: ["Scientific"] },
+    "Fungal Mould|Moisissure fongique": { type: "Plante", avgPrice: 150, sellTo: ["Scientific"] },
+    "Gamma Root|Racine gamma": { type: "Plante", avgPrice: 180, sellTo: ["Scientific"] },
+    "Feral Dust|Poussière sauvage": { type: "Ressource rare", avgPrice: 250, sellTo: ["Scientific"] },
+    "Salt|Sels": { type: "Minéral", avgPrice: 40, sellTo: ["Manufacturing"] },
+    "Cobalt|Cobalt": { type: "Minéral", avgPrice: 200, sellTo: ["Technology"] }
 };
 
 // Afficher les ressources
@@ -99,6 +109,9 @@ function initializeResources() {
         console.error('searchResourceBtn not found');
     }
 }
+
+// Exposer la fonction globalement
+window.initializeResources = initializeResources;
 
 // Appeler l'initialisation uniquement une fois
 if (document.readyState === 'loading') {

@@ -34,5 +34,13 @@ window.products = {
     "Industrial-Grade Battery|Batterie industrielle": { economy: "power", sellTo: ["Mining"], avgPrice: 12000 },
     "Ohmic Gel|Gel ohmique": { economy: "power", sellTo: ["Mining"], avgPrice: 8000 },
     "Experimental Force Shield|Bouclier de force expérimental": { economy: "power", sellTo: ["Mining"], avgPrice: 15000 },
-    "Fusion Core|Cœur de fusion": { economy: "power", sellTo: ["Mining"], avgPrice: 20000 }
+    "Fusion Core|Cœur de fusion": { economy: "power", sellTo: ["Mining"], avgPrice: 20000 },
+    "Living Pearl|Perle vivante": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"], avgPrice: 25000 },
+    "Hadron Injector|Injecteur d'hadron": { economy: "materials", sellTo: ["Scientific"], avgPrice: 18000 },
+    "Quantum Processor|Processeur quantique": { economy: "technology", sellTo: ["Power Generation"], avgPrice: 16000 },
+    "Cryo-Pump|Pompe cryogénique": { economy: "scientific", sellTo: ["Trading"], avgPrice: 14000 },
+    "Geodesite|Géodésite": { economy: "mining", sellTo: ["Manufacturing"], avgPrice: 4500 },
+    "Semiconductor|Semiconducteur": { economy: "manufacturing", sellTo: ["Technology"], avgPrice: 11000 },
+    "Solar Mirror|Miroir solaire": { economy: "power", sellTo: ["Mining"], avgPrice: 13000 },
+    "Exotic Tissue|Tissu exotique": { economy: "scientific", sellTo: ["Trading"], avgPrice: 20000 }
 };
