@@ -17,8 +17,9 @@ jobs:
       uses: android-actions/setup-android@v3
     - name: Install Android SDK
       run: |
-        sdkmanager "platforms;android-33" "build-tools;34.0.0"
+        sdkmanager "platforms;android-33" "build-tools;33.0.0"
         echo "ANDROID_HOME is set to $ANDROID_HOME"
+        ls -la $ANDROID_HOME/build-tools/33.0.0/ || echo "Build tools directory not found"
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -43,7 +44,7 @@ jobs:
         cordova prepare android
     - name: Build Android APK (Debug)
       working-directory: ./nms-app
-      run: cordova build android --debug
+      run: cordova build android --debug --verbose
     - name: Verify APK
       working-directory: ./nms-app
       run: |
