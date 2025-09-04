@@ -57,20 +57,18 @@ jobs:
       working-directory: ./nms-app
       run: cordova build android --release -- --packageType=apk
 
-    - name: Sign APK (optional for test - configure secrets)
-      if: false  # Active pour production
+    - name: Generate and Sign APK
       working-directory: ./nms-app
-      env:
-        KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
-        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: |
-        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $KEYSTORE_PATH -storepass $KEYSTORE_PASSWORD -keypass $KEY_PASSWORD platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk $KEY_ALIAS
+        # Generate a temporary keystore for testing
+        keytool -genkey -v -keystore temp.keystore -alias testalias -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Test, OU=Test, O=Test, L=Test, S=Test, C=US" -storepass testpass -keypass testpass
+        # Sign the APK
+        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore temp.keystore -storepass testpass -keypass testpass platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk testalias
+        # Align the APK
         zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk platforms/android/app/build/outputs/apk/release/app-release.apk
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: nms-trading-apk
-        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release.apk
