@@ -36,7 +36,7 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:foc
 .search-btn, .primary-btn { padding: 15px 25px; background: linear-gradient(45deg, #3b82f6, #6366f1);
     border: none; border-radius: 12px; color: white; font-size: 16px; cursor: pointer; }
 .secondary-btn { padding: 12px 24px; background: rgba(51, 65, 85, 0.6); border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 8px; color: #e8eaed; cursor: pointer; }
+    border-radius: 8px; color: #e8eaed; cursor: pointer; margin-right: 10px; }
 .suggestions { position: absolute; top: 100%; left: 0; right: 70px; background: rgba(15, 23, 42, 0.95);
     border-radius: 12px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none; margin-top: 5px; }
 .suggestion-item { padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; transition: background-color 0.2s; }
@@ -44,7 +44,7 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:foc
 .system-form { background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 25px; margin: 20px 0; }
 .form-group { margin-bottom: 20px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.systems-list, #resourcesList { margin-top: 20px; }
+.systems-list, #resourcesList, #resultsList, #comparatorResults { margin-top: 20px; display: flex; flex-direction: column; gap: 15px; }
 .system-card, .resource-card {
     background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 20px; margin-bottom: 15px;
 }
@@ -60,8 +60,11 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:foc
     padding: 8px 12px; border-radius: 8px; cursor: pointer; min-width: 60px; }
 .nav-btn:hover, .nav-btn.active { color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
 .nav-icon { font-size: 20px; margin-bottom: 4px; }
-.nav-label { font-size: 11px; font-weight: 500; }
-.no-result { text-align: center; color: #94a3b8; padding: 40px 20px; background: rgba(30, 41, 59, 0.3); border-radius: 12px; }
+.nav-label { font-size: 11px; font-weight: 500; color: #e8eaed; } /* Meilleur contraste */
+.no-result { text-align: center; color: #e8eaed; padding: 40px 20px; background: rgba(30, 41, 59, 0.3); border-radius: 12px; } /* Meilleur contraste */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px; border: 1px solid rgba(148, 163, 184, 0.2); text-align: left; }
+th { background: rgba(51, 65, 85, 0.6); }
 @media (max-width: 700px) {
     .header { flex-direction: column; }
     .search-container { flex-direction: column; }

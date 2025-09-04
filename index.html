@@ -1,336 +1,127 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Outil de Commerce No Man's Sky</title>
-<style>
-/* --- CSS inchangé, ton style original --- */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(ellipse at 20% 50%, rgba(120,119,198,0.3) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(255,119,198,0.2) 0%, transparent 50%),
-                linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0e1b3e 100%);
-    min-height: 100vh; padding: 20px; color: #e8eaed;
-}
-.stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-.star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
-@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-.container {
-    max-width: 900px; margin: 0 auto; background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.1);
-    border-radius: 16px; padding: 30px; padding-bottom: 90px;
-    box-shadow: 0 0 50px rgba(59, 130, 246, 0.1); position: relative; z-index: 10;
-}
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-h1 { font-size: 2.2em; font-weight: 300; background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; flex: 1; text-align: center; }
-.lang-switch { display: flex; background: rgba(30, 41, 59, 0.8); border-radius: 25px; padding: 4px; }
-.lang-btn { padding: 8px 16px; border: none; background: transparent; color: #94a3b8; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; font-size: 14px; font-weight: 600; }
-.lang-btn.active { background: linear-gradient(45deg, #3b82f6, #6366f1); color: white; }
-.page-section { display: none; animation: fadeInUp 0.6s ease; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-.search-container { display: flex; gap: 10px; margin-bottom: 30px; position: relative; }
-input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 12px 20px; font-size: 16px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; color: #e8eaed; outline: none; }
-input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus { border-color: #60a5fa; box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
-.search-btn, .primary-btn { padding: 15px 25px; background: linear-gradient(45deg, #3b82f6, #6366f1); border: none; border-radius: 12px; color: white; font-size: 16px; cursor: pointer; }
-.secondary-btn { padding: 12px 24px; background: rgba(51, 65, 85, 0.6); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px; color: #e8eaed; cursor: pointer; }
-.suggestions { position: absolute; top: 100%; left: 0; right: 70px; background: rgba(15, 23, 42, 0.95); border-radius: 12px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none; margin-top: 5px; }
-.suggestion-item { padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; transition: background-color 0.2s; }
-.suggestion-item:hover { background: rgba(51, 65, 85, 0.5); }
-.system-form { background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 25px; margin: 20px 0; }
-.form-group { margin-bottom: 20px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.systems-list { margin-top: 20px; }
-.system-card { background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
-.system-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.system-name { font-size: 18px; font-weight: 600; color: #f8fafc; }
-.system-coords { color: #60a5fa; font-family: monospace; font-size: 12px; }
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(148, 163, 184, 0.2); display: flex; justify-content: space-around; padding: 10px; z-index: 1000; }
-.nav-btn { background: none; border: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; padding: 8px 12px; border-radius: 8px; cursor: pointer; min-width: 60px; }
-.nav-btn:hover, .nav-btn.active { color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
-.nav-icon { font-size: 20px; margin-bottom: 4px; }
-.nav-label { font-size: 11px; font-weight: 500; }
-.no-result { text-align: center; color: #94a3b8; padding: 40px 20px; background: rgba(30, 41, 59, 0.3); border-radius: 12px; }
-@media (max-width: 700px) { .header { flex-direction: column; } .search-container { flex-direction: column; } .form-row { grid-template-columns: 1fr; } }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NMS Trading</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="stars" id="stars"></div>
-
-<div class="container">
-    <div class="header">
-        <h1 id="mainTitle">✦ COMMERCE GALACTIQUE ✦</h1>
-        <div class="lang-switch">
-            <button class="lang-btn active" onclick="switchLanguage('fr', event)">🇫🇷 FR</button>
-            <button class="lang-btn" onclick="switchLanguage('en', event)">🇬🇧 EN</button>
+    <div id="stars" class="stars"></div>
+    <div class="container">
+        <div class="header">
+            <h1>✦ COMMERCE GALACTIQUE ✦</h1>
+            <div class="lang-switch">
+                <button class="lang-btn active" data-lang="fr" aria-label="Français">🇫🇷 FR</button>
+                <button class="lang-btn" data-lang="en" aria-label="English">🇬🇧 EN</button>
+            </div>
         </div>
-    </div>
 
-    <!-- Pages -->
-    <div id="searchPage" class="page-section" style="display: block;">
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="">
-            <button class="search-btn" onclick="performSearch()"><span id="searchBtnText">🔍 Chercher</span></button>
-            <div id="suggestions" class="suggestions"></div>
+        <!-- Section Recherche -->
+        <div class="page-section" id="search" style="display: block;">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Rechercher un produit...">
+                <button class="search-btn" id="searchBtn" onclick="searchProduct(document.getElementById('searchInput').value)">🔍 Chercher</button>
+            </div>
+            <div id="resultsList"></div> <!-- Conteneur pour les résultats de recherche -->
+            <div class="suggestions" id="suggestions"></div>
         </div>
-        <div id="resultSection"></div>
-    </div>
 
-    <div id="systemsPage" class="page-section">
-        <h2 id="systemsTitle">📡 Mes Systèmes Sauvegardés</h2>
-        <button class="primary-btn" onclick="showAddForm()" id="addSystemBtn">➕ Ajouter un système</button>
-        <div id="systemsList" class="systems-list"></div>
-    </div>
+        <!-- Section Systèmes -->
+        <div class="page-section" id="systems">
+            <h2>📡 Mes Systèmes Sauvegardés</h2>
+            <button class="primary-btn" id="addSystemBtn" onclick="showAddSystemForm()">➕ Ajouter un système</button>
+            <div id="systemsList" class="systems-list"></div>
+        </div>
 
-    <div id="addSystemPage" class="page-section">
-        <h2 id="addSystemTitle">➕ Nouveau Système</h2>
-        <form id="addSystemForm" class="system-form">
-            <div class="form-group">
-                <label id="systemNameLabel">Nom du système:</label>
-                <input type="text" id="systemName" required>
-            </div>
-            <div class="form-group">
-                <label id="economyTypeLabel">Type d'économie:</label>
-                <select id="economyType" required>
-                    <option value="">Sélectionner...</option>
-                    <option value="trading">Marchande/Trading</option>
-                    <option value="manufacturing">Fabrication/Manufacturing</option>
-                    <option value="technology">High-tech/Technology</option>
-                    <option value="power">Génération d'énergie/Power</option>
-                    <option value="mining">Minière/Mining</option>
-                    <option value="scientific">Scientifique/Scientific</option>
-                    <option value="materials">Alliages avancés/Materials</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label id="coordinatesLabel">Coordonnées:</label>
-                <input type="text" id="coordinates" placeholder="042700810D6D0227" required>
-            </div>
-            <div class="form-row">
+        <!-- Formulaire d'ajout de système (caché par défaut) -->
+        <div class="page-section system-form" id="add-system" style="display: none;">
+            <h2>➕ Nouveau Système</h2>
+            <form id="systemForm">
                 <div class="form-group">
-                    <label id="buyPercentLabel">% Achat:</label>
-                    <input type="number" id="buyPercent" placeholder="-23" min="-100" max="100" required>
+                    <label for="systemName">Nom du système:</label>
+                    <input type="text" id="systemName">
                 </div>
                 <div class="form-group">
-                    <label id="sellPercentLabel">% Vente:</label>
-                    <input type="number" id="sellPercent" placeholder="47" min="-100" max="100" required>
+                    <label for="economyType">Type d'économie:</label>
+                    <select id="economyType">
+                        <option value="">Sélectionner...</option>
+                        <option value="trading">Marchande/Trading</option>
+                        <option value="manufacturing">Fabrication/Manufacturing</option>
+                        <option value="technology">High-tech/Technology</option>
+                        <option value="power">Génération d'énergie/Power</option>
+                        <option value="mining">Minière/Mining</option>
+                        <option value="scientific">Scientifique/Scientific</option>
+                        <option value="materials">Alliages avancés/Materials</option>
+                    </select>
                 </div>
-            </div>
-            <div class="form-group">
-                <label id="notesLabel">Notes:</label>
-                <textarea id="systemNotes" placeholder="Notes optionnelles"></textarea>
-            </div>
-            <div style="display: flex; gap: 15px; justify-content: flex-end;">
-                <button type="button" class="secondary-btn" onclick="showPage('systems')" id="cancelBtn">Annuler</button>
-                <button type="submit" class="primary-btn" id="saveSystemBtn">💾 Sauvegarder</button>
-            </div>
-        </form>
-    </div>
-
-    <div id="comparatorPage" class="page-section">
-        <h2 id="comparatorTitle">📊 Comparateur de Systèmes</h2>
-        <div class="search-container">
-            <input type="text" id="productSearchInput" placeholder="">
-            <button class="search-btn" onclick="searchInSystems()" id="searchProductBtn">🔍</button>
+                <div class="form-group">
+                    <label for="coordinates">Coordonnées:</label>
+                    <input type="text" id="coordinates">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="buyPercent">% Achat:</label>
+                        <input type="number" id="buyPercent">
+                    </div>
+                    <div class="form-group">
+                        <label for="sellPercent">% Vente:</label>
+                        <input type="number" id="sellPercent">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes:</label>
+                    <textarea id="notes"></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="secondary-btn" onclick="hideAddSystemForm()">Annuler</button>
+                    <button type="button" class="primary-btn" id="saveSystemBtn" onclick="saveSystem()">💾 Sauvegarder</button>
+                </div>
+            </form>
         </div>
-        <div id="comparisonResults"></div>
-    </div>
-</div>
 
-<nav class="bottom-nav">
-    <button class="nav-btn active" onclick="showPage('search')" id="navSearch">
-        <span class="nav-icon">🔍</span>
-        <span class="nav-label" id="navSearchLabel">Recherche</span>
-    </button>
-    <button class="nav-btn" onclick="showPage('systems')" id="navSystems">
-        <span class="nav-icon">📡</span>
-        <span class="nav-label" id="navSystemsLabel">Systèmes</span>
-    </button>
-    <button class="nav-btn" onclick="showPage('comparator')" id="navComparator">
-        <span class="nav-icon">📊</span>
-        <span class="nav-label" id="navComparatorLabel">Comparer</span>
-    </button>
-</nav>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-let currentLanguage = 'fr';
-let savedSystems = JSON.parse(localStorage.getItem('nmsSavedSystems')) || [];
-
-// --- Fonctions utilitaires ---
-function generateStars() {
-    const starsContainer = document.getElementById('stars');
-    for (let i = 0; i < 100; i++) {
-        const star = document.createElement('div');
-        star.classList.add('star');
-        star.style.width = star.style.height = Math.random() * 2 + 1 + 'px';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.left = Math.random() * 100 + '%';
-        starsContainer.appendChild(star);
-    }
-}
-
-function showPage(page) {
-    ['search', 'systems', 'addSystem', 'comparator'].forEach(p => {
-        const el = document.getElementById(p + 'Page');
-        if(el) el.style.display = (p === page) ? 'block' : 'none';
-        const btn = document.getElementById('nav' + capitalize(p));
-        if(btn) btn.classList.toggle('active', p === page);
-    });
-}
-
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// --- Langues ---
-function switchLanguage(lang, evt) {
-    currentLanguage = lang;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    evt.target.classList.add('active');
-    updateTexts();
-}
-
-function updateTexts() {
-    const translations = {
-        fr: {
-            searchPlaceholder: 'Nom du système ou produit...',
-            searchBtnText: '🔍 Chercher',
-            systemsTitle: '📡 Mes Systèmes Sauvegardés',
-            addSystemTitle: '➕ Nouveau Système',
-            systemNameLabel: 'Nom du système:',
-            economyTypeLabel: 'Type d\'économie:',
-            coordinatesLabel: 'Coordonnées:',
-            buyPercentLabel: '% Achat:',
-            sellPercentLabel: '% Vente:',
-            notesLabel: 'Notes:',
-            cancelBtn: 'Annuler',
-            saveSystemBtn: '💾 Sauvegarder',
-            comparatorTitle: '📊 Comparateur de Systèmes'
-        },
-        en: {
-            searchPlaceholder: 'System or product name...',
-            searchBtnText: '🔍 Search',
-            systemsTitle: '📡 My Saved Systems',
-            addSystemTitle: '➕ New System',
-            systemNameLabel: 'System Name:',
-            economyTypeLabel: 'Economy Type:',
-            coordinatesLabel: 'Coordinates:',
-            buyPercentLabel: 'Buy %:',
-            sellPercentLabel: 'Sell %:',
-            notesLabel: 'Notes:',
-            cancelBtn: 'Cancel',
-            saveSystemBtn: '💾 Save',
-            comparatorTitle: '📊 System Comparator'
-        }
-    };
-    const t = translations[currentLanguage];
-    document.getElementById('searchInput').placeholder = t.searchPlaceholder;
-    document.getElementById('searchBtnText').textContent = t.searchBtnText;
-    document.getElementById('systemsTitle').textContent = t.systemsTitle;
-    document.getElementById('addSystemTitle').textContent = t.addSystemTitle;
-    document.getElementById('systemNameLabel').textContent = t.systemNameLabel;
-    document.getElementById('economyTypeLabel').textContent = t.economyTypeLabel;
-    document.getElementById('coordinatesLabel').textContent = t.coordinatesLabel;
-    document.getElementById('buyPercentLabel').textContent = t.buyPercentLabel;
-    document.getElementById('sellPercentLabel').textContent = t.sellPercentLabel;
-    document.getElementById('notesLabel').textContent = t.notesLabel;
-    document.getElementById('cancelBtn').textContent = t.cancelBtn;
-    document.getElementById('saveSystemBtn').textContent = t.saveSystemBtn;
-    document.getElementById('comparatorTitle').textContent = t.comparatorTitle;
-}
-
-// --- Formulaire et sauvegarde ---
-function renderSystems() {
-    const list = document.getElementById('systemsList');
-    list.innerHTML = '';
-    if(savedSystems.length === 0) {
-        list.innerHTML = `<div class="no-result">Aucun système sauvegardé.</div>`;
-        return;
-    }
-    savedSystems.forEach((sys, idx) => {
-        const card = document.createElement('div');
-        card.className = 'system-card';
-        card.innerHTML = `
-            <div class="system-header">
-                <div class="system-name">${sys.name}</div>
-                <button class="secondary-btn" onclick="deleteSystem(${idx})">❌</button>
+        <!-- Section Comparateur -->
+        <div class="page-section" id="comparator">
+            <h2>📊 Comparateur de Systèmes</h2>
+            <div class="search-container">
+                <input type="text" id="productSearchInput" placeholder="Chercher un produit...">
+                <button class="search-btn" id="searchProductBtn" onclick="compareSystems(document.getElementById('productSearchInput').value)">🔍 Chercher</button>
             </div>
-            <div class="system-coords">Coord: ${sys.coords}</div>
-            <div>Éco: ${sys.economy}</div>
-            <div>Achat: ${sys.buy}% / Vente: ${sys.sell}%</div>
-            <div>Notes: ${sys.notes || '-'}</div>
-        `;
-        list.appendChild(card);
-    });
-}
+            <div id="comparatorResults"></div> <!-- Conteneur pour les résultats de comparaison -->
+        </div>
 
-function showAddForm() {
-    showPage('addSystem');
-}
+        <!-- Section Ressources (nouvel onglet) -->
+        <div class="page-section" id="resources">
+            <h2>📚 Ressources</h2>
+            <div class="search-container">
+                <input type="text" id="resourceSearchInput" placeholder="Rechercher une ressource...">
+                <button class="search-btn" id="searchResourceBtn" onclick="searchResource(document.getElementById('resourceSearchInput').value)">🔍 Chercher</button>
+            </div>
+            <div id="resourcesList"></div> <!-- Conteneur pour la liste des ressources -->
+        </div>
+    </div>
 
-document.getElementById('addSystemForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const newSys = {
-        name: document.getElementById('systemName').value,
-        economy: document.getElementById('economyType').value,
-        coords: document.getElementById('coordinates').value,
-        buy: parseInt(document.getElementById('buyPercent').value),
-        sell: parseInt(document.getElementById('sellPercent').value),
-        notes: document.getElementById('systemNotes').value
-    };
-    savedSystems.push(newSys);
-    localStorage.setItem('nmsSavedSystems', JSON.stringify(savedSystems));
-    renderSystems();
-    showPage('systems');
-    document.getElementById('addSystemForm').reset();
-});
+    <!-- Navigation inférieure -->
+    <div class="bottom-nav">
+        <button class="nav-btn active" data-section="search">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">Recherche</span>
+        </button>
+        <button class="nav-btn" data-section="systems">
+            <span class="nav-icon">📡</span>
+            <span class="nav-label">Systèmes</span>
+        </button>
+        <button class="nav-btn" data-section="comparator">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Comparer</span>
+        </button>
+        <button class="nav-btn" data-section="resources">
+            <span class="nav-icon">📚</span>
+            <span class="nav-label">Ressources</span>
+        </button>
+    </div>
 
-window.deleteSystem = function(idx) {
-    if(confirm('Supprimer ce système ?')) {
-        savedSystems.splice(idx, 1);
-        localStorage.setItem('nmsSavedSystems', JSON.stringify(savedSystems));
-        renderSystems();
-    }
-};
-
-// --- Recherche ---
-function performSearch() {
-    const val = document.getElementById('searchInput').value.toLowerCase();
-    const res = savedSystems.filter(s => s.name.toLowerCase().includes(val));
-    const section = document.getElementById('resultSection');
-    if(res.length === 0) {
-        section.innerHTML = `<div class="no-result">Aucun résultat trouvé.</div>`;
-        return;
-    }
-    section.innerHTML = res.map(s => `<div class="system-card"><div class="system-name">${s.name}</div></div>`).join('');
-}
-
-// --- Comparator ---
-function searchInSystems() {
-    const val = document.getElementById('productSearchInput').value.toLowerCase();
-    const res = savedSystems.filter(s => s.name.toLowerCase().includes(val));
-    const section = document.getElementById('comparisonResults');
-    if(res.length === 0) {
-        section.innerHTML = `<div class="no-result">Aucun résultat pour la comparaison.</div>`;
-        return;
-    }
-    section.innerHTML = res.map(s => `<div class="system-card"><div class="system-name">${s.name}</div></div>`).join('');
-}
-
-// --- Init ---
-generateStars();
-updateTexts();
-renderSystems();
-showPage('search');
-
-window.showPage = showPage;
-window.switchLanguage = switchLanguage;
-
-}); // DOMContentLoaded
-</script>
-
+    <script src="cordova.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
