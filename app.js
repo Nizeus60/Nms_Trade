@@ -191,8 +191,6 @@ function updateTranslations() {
         }
     });
     displaySystems();
-    // Temporairement désactivé pour éviter les erreurs liées à `resources`
-    // displayResources();
 }
 
 // Changer de section
@@ -408,8 +406,6 @@ function initializeApp() {
     generateStars();
     updateTranslations();
     displaySystems();
-    // Temporairement désactivé pour éviter les erreurs
-    // displayResources();
 
     // Attacher les écouteurs pour la langue et la navigation
     const langButtons = document.querySelectorAll('.lang-btn');
@@ -424,7 +420,7 @@ function initializeApp() {
         btn.addEventListener('click', () => switchSection(btn.dataset.section));
     });
 
-    // Attacher les écouteurs pour la recherche
+    // Attacher les écouteurs pour la recherche de produits
     const productSearch = document.getElementById('productSearch');
     const searchProductBtn = document.getElementById('searchProductBtn');
     
@@ -435,9 +431,6 @@ function initializeApp() {
             console.log('Input event triggered with query:', query);
             displaySuggestions(query);
         });
-        // Test temporaire pour vérifier le filtrage
-        console.log('Testing search with query "Données"');
-        searchProduct('Données');
     } else {
         console.error('productSearch input not found');
     }
@@ -451,6 +444,32 @@ function initializeApp() {
         });
     } else {
         console.error('searchProductBtn not found');
+    }
+
+    // Attacher les écouteurs pour la recherche de ressources
+    const resourceSearch = document.getElementById('resourceSearch');
+    const searchResourceBtn = document.getElementById('searchResourceBtn');
+    
+    if (resourceSearch) {
+        console.log('Attaching input listener to resourceSearch');
+        resourceSearch.addEventListener('input', () => {
+            const query = resourceSearch.value;
+            console.log('Resource input event triggered with query:', query);
+            searchResource(query); // Défini dans resources.js
+        });
+    } else {
+        console.error('resourceSearch input not found');
+    }
+
+    if (searchResourceBtn) {
+        console.log('Attaching click listener to searchResourceBtn');
+        searchResourceBtn.addEventListener('click', () => {
+            const query = resourceSearch.value;
+            console.log('Resource search button clicked with query:', query);
+            searchResource(query); // Défini dans resources.js
+        });
+    } else {
+        console.error('searchResourceBtn not found');
     }
 
     // Attacher les écouteurs pour l'ajout de systèmes

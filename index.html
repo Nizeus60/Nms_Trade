@@ -42,6 +42,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
     <title>NMS Trading</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -51,17 +52,17 @@
         <div class="header">
             <h1 id="appTitle">✦ COMMERCE GALACTIQUE ✦</h1>
             <div class="lang-switch">
-                <button class="lang-btn" data-lang="fr">🇫🇷 FR</button>
+                <button class="lang-btn active" data-lang="fr">🇫🇷 FR</button>
                 <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
             </div>
         </div>
 
         <div id="searchSection" class="section active">
             <div class="search-container">
-                <div id="productSuggestions" class="suggestions"></div>
                 <input type="text" id="productSearch" placeholder="Rechercher un produit...">
                 <button id="searchProductBtn">🔍 Chercher</button>
             </div>
+            <div id="productSuggestions"></div>
             <div id="resultsList"></div>
         </div>
 
@@ -74,39 +75,45 @@
         <div id="addSystemSection" class="section">
             <h2 id="addSystemTitle">➕ Nouveau Système</h2>
             <div class="form-row">
-                <label for="systemName">Nom du système:</label>
-                <input type="text" id="systemName">
-            </div>
-            <div class="form-row">
-                <label for="economyType">Type d'économie:</label>
-                <select id="economyType">
-                    <option value="">Sélectionner...</option>
-                    <option value="trading">Marchande/Trading</option>
-                    <option value="manufacturing">Fabrication/Manufacturing</option>
-                    <option value="technology">High-tech/Technology</option>
-                    <option value="power">Génération d'énergie/Power</option>
-                    <option value="mining">Minière/Mining</option>
-                    <option value="scientific">Scientifique/Scientific</option>
-                    <option value="materials">Alliages avancés/Materials</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <label for="coordinates">Coordonnées:</label>
-                <input type="text" id="coordinates">
-            </div>
-            <div class="form-row form-row-double">
                 <div>
-                    <label for="buyPercent">% Achat:</label>
-                    <input type="number" id="buyPercent" min="-100" max="100">
+                    <label>Nom du système:</label>
+                    <input type="text" id="systemName">
                 </div>
                 <div>
-                    <label for="sellPercent">% Vente:</label>
-                    <input type="number" id="sellPercent" min="-100" max="100">
+                    <label>Type d'économie:</label>
+                    <select id="economyType">
+                        <option value="">Sélectionner...</option>
+                        <option value="Trading">Marchande/Trading</option>
+                        <option value="Manufacturing">Fabrication/Manufacturing</option>
+                        <option value="Technology">High-tech/Technology</option>
+                        <option value="Power Generation">Génération d'énergie/Power</option>
+                        <option value="Mining">Minière/Mining</option>
+                        <option value="Scientific">Scientifique/Scientific</option>
+                        <option value="Advanced Materials">Alliages avancés/Materials</option>
+                    </select>
                 </div>
             </div>
             <div class="form-row">
-                <label for="notes">Notes:</label>
-                <textarea id="notes"></textarea>
+                <div>
+                    <label>Coordonnées:</label>
+                    <input type="text" id="coordinates">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>% Achat:</label>
+                    <input type="number" id="buyPercent">
+                </div>
+                <div>
+                    <label>% Vente:</label>
+                    <input type="number" id="sellPercent">
+                </div>
+            </div>
+            <div class="form-row">
+                <div>
+                    <label>Notes:</label>
+                    <textarea id="notes"></textarea>
+                </div>
             </div>
             <div class="form-row">
                 <button id="cancelSystemBtn">Annuler</button>
@@ -152,6 +159,8 @@
         </button>
     </div>
 
-    <script src="app.js"></script>
+    <script src="cordova.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/resources.js"></script>
 </body>
 </html>
