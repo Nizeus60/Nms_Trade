@@ -14,13 +14,11 @@
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="21" />
-        <preference name="android-targetSdkVersion" value="33" />
-        <icon src="res/icon/android/icon.png" density="mdpi" /> <!-- Placeholder pour test -->
-        <splash src="res/screen/android/splash.png" density="mdpi" /> <!-- Placeholder pour test -->
+        <preference name="android-targetSdkVersion" value="34" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- Pour futures extensions -->
+    <uses-permission android:name="android.permission.INTERNET" />
 </widget>
