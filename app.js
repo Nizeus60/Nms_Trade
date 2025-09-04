@@ -191,7 +191,8 @@ function updateTranslations() {
         }
     });
     displaySystems();
-    displayResources();
+    // Temporairement désactivé pour éviter les erreurs liées à `resources`
+    // displayResources();
 }
 
 // Changer de section
@@ -287,6 +288,7 @@ function searchProduct(query) {
         const name = currentLanguage === 'en' ? names[0] : names[1];
         return name.toLowerCase().includes(query.toLowerCase());
     });
+    console.log('Filtered products:', filteredProducts);
     if (filteredProducts.length === 0) {
         console.log('No products found for query:', query);
         resultsList.innerHTML = `<div class="no-result">${translations[currentLanguage].noResult}</div>`;
@@ -310,6 +312,7 @@ function displaySuggestions(query) {
             const name = currentLanguage === 'en' ? names[0] : names[1];
             return name.toLowerCase().includes(query.toLowerCase());
         });
+        console.log('Suggestions filtered products:', filteredProducts);
         filteredProducts.forEach(key => {
             const product = products[key];
             const name = key.split('|')[currentLanguage === 'en' ? 0 : 1];
@@ -327,6 +330,7 @@ function displaySuggestions(query) {
             });
             suggestions.appendChild(suggestionItem);
         });
+        console.log('Suggestions HTML:', suggestions.innerHTML);
     }
 }
 
@@ -363,6 +367,7 @@ function displayResults(productKeys) {
         `;
         resultsList.appendChild(card);
     });
+    console.log('Results HTML:', resultsList.innerHTML);
 }
 
 // Comparateur de systèmes
@@ -397,44 +402,15 @@ function compareSystems(productKey) {
     });
 }
 
-// Afficher les ressources
-function displayResources(query = '') {
-    console.log('Displaying resources for query:', query);
-    const resourcesList = document.getElementById('resourcesList');
-    if (!resourcesList) {
-        console.error('Resources list not found');
-        return;
-    }
-    resourcesList.innerHTML = '';
-    const filteredResources = resources.filter(res => res.name.toLowerCase().includes(query.toLowerCase()));
-    if (filteredResources.length === 0) {
-        resourcesList.innerHTML = `<div class="no-result">${translations[currentLanguage].noResult}</div>`;
-        return;
-    }
-    const table = document.createElement('table');
-    table.innerHTML = `<thead><tr><th>Nom</th><th>Type</th><th>Prix moyen</th><th>Vendre à</th></tr></thead><tbody></tbody>`;
-    filteredResources.forEach(res => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${res.name}</td><td>${res.type}</td><td>${res.avgPrice}</td><td>${res.sell}</td>`;
-        table.querySelector('tbody').appendChild(row);
-    });
-    resourcesList.appendChild(table);
-}
-
-// Recherche de ressource
-function searchResource(query) {
-    console.log('Searching resource:', query);
-    displayResources(query);
-}
-
 // Initialisation
-document.addEventListener('deviceready', () => {
-    console.log('Cordova deviceready fired');
+function initializeApp() {
+    console.log('Initializing app...');
     generateStars();
     updateTranslations();
     displaySystems();
-    displayResources();
-    
+    // Temporairement désactivé pour éviter les erreurs
+    // displayResources();
+
     // Attacher les écouteurs pour la langue et la navigation
     const langButtons = document.querySelectorAll('.lang-btn');
     console.log('Found language buttons:', langButtons.length);
@@ -459,6 +435,9 @@ document.addEventListener('deviceready', () => {
             console.log('Input event triggered with query:', query);
             displaySuggestions(query);
         });
+        // Test temporaire pour vérifier le filtrage
+        console.log('Testing search with query "Données"');
+        searchProduct('Données');
     } else {
         console.error('productSearch input not found');
     }
@@ -476,4 +455,16 @@ document.addEventListener('deviceready', () => {
 
     // Attacher les écouteurs pour l'ajout de systèmes
     addSystemListeners();
-});
+}
+
+// Exécuter l'initialisation pour deviceready ou DOMContentLoaded
+document.addEventListener('deviceready', () => {
+    console.log('Cordova deviceready fired');
+    initializeApp();
+}, false);
+
+// Fallback pour les tests hors Cordova
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded fired (fallback)');
+    initializeApp();
+}, false);
