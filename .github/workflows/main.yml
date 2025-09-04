@@ -12,6 +12,9 @@ jobs:
     
     - name: Install Cordova
       run: npm install -g cordova
+
+    - name: Install AdMob plugin
+      run: npm install -g cordova-plugin-admob-free
     
     - name: Create Cordova project
       run: cordova create nms-app com.nmstrading.app "NMS Trading"
