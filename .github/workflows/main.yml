@@ -1,46 +1,34 @@
 name: Build APK
-
 on:
   push:
     branches: [main]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout repo
       uses: actions/checkout@v4
-
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'adopt'
-
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-
-    - name: Install Android SDK 34
+    - name: Install Android SDK
       run: |
-        sdkmanager "platforms;android-34" "build-tools;34.0.0"
-        # Afficher le chemin de l'Android SDK pour débogage
+        sdkmanager "platforms;android-33" "build-tools;34.0.0"
         echo "ANDROID_HOME is set to $ANDROID_HOME"
-
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-
     - name: Install Cordova
       run: npm install -g cordova@12.0.0
-
     - name: Clean old Cordova project
       run: rm -rf nms-app
-
     - name: Create Cordova project
       run: cordova create nms-app com.nmstrading.app "NMS Trading"
-
     - name: Copy files
       run: |
         mkdir -p nms-app/www
@@ -48,25 +36,21 @@ jobs:
         cp app.js nms-app/www/
         cp style.css nms-app/www/
         cp config.xml nms-app/
-
     - name: Add Android platform
       working-directory: ./nms-app
       run: |
         cordova platform add android
         cordova prepare android
-
-    - name: Build Android APK
+    - name: Build Android APK (Debug)
       working-directory: ./nms-app
-      run: cordova build android --release -- --packageType=apk
-
+      run: cordova build android --debug
     - name: Verify APK
       working-directory: ./nms-app
       run: |
-        # Vérifier l'intégrité de l'APK
-        zipinfo -l platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk || echo "APK is corrupted"
-
+        ls -la platforms/android/app/build/outputs/apk/debug/
+        zipinfo -l platforms/android/app/build/outputs/apk/debug/app-debug.apk || echo "APK is corrupted"
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: nms-trading-apk
-        path: nms-app/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        name: nms-trading-apk-debug
+        path: nms-app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
