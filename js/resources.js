@@ -1,5 +1,5 @@
-// Ressources (basées sur No Man's Sky)
-const resources = {
+console.log('resources.js loaded');
+window.resources = {
     "Graviton Orb|Orbe de gravitino": { type: "Ressource rare", avgPrice: 12000, sellTo: ["Scientific"] },
     "Pure Ferrite|Ferrite pure": { type: "Minéral", avgPrice: 28, sellTo: ["Manufacturing"] },
     "Ammonia|Ammoniac": { type: "Minéral", avgPrice: 62, sellTo: ["Mining"] },
@@ -34,28 +34,28 @@ function displayResources(query = '') {
         return;
     }
     resourcesList.innerHTML = '';
-    const filteredResources = Object.keys(resources).filter(key => {
+    const filteredResources = Object.keys(window.resources).filter(key => {
         const names = key.split('|');
-        const name = (typeof currentLanguage !== 'undefined' && currentLanguage === 'en') ? names[0] : names[1];
+        const name = currentLanguage === 'en' ? names[0] : names[1];
         return name.toLowerCase().includes(query.toLowerCase());
     });
     console.log('Filtered resources:', filteredResources);
     if (filteredResources.length === 0) {
-        resourcesList.innerHTML = `<div class="no-result">${typeof translations !== 'undefined' ? translations[currentLanguage].noResult : 'Aucun résultat trouvé'}</div>`;
+        resourcesList.innerHTML = `<div class="no-result">${translations[currentLanguage].noResult}</div>`;
         return;
     }
     const table = document.createElement('table');
     table.innerHTML = `<thead><tr><th>Nom</th><th>Type</th><th>Prix moyen</th><th>Vendre à</th></tr></thead><tbody></tbody>`;
     filteredResources.forEach(key => {
-        const res = resources[key];
-        const name = key.split('|')[(typeof currentLanguage !== 'undefined' && currentLanguage === 'en') ? 0 : 1];
+        const res = window.resources[key];
+        const name = key.split('|')[currentLanguage === 'en' ? 0 : 1];
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${name}</td>
             <td>${res.type}</td>
             <td>${res.avgPrice} unités</td>
             <td>${res.sellTo.map(e => `
-                <span class="economy-dot sell-economy" style="background-color: ${typeof economyColors !== 'undefined' ? economyColors[e.toLowerCase()] : '#FFFFFF'}"></span>
+                <span class="economy-dot sell-economy" style="background-color: ${economyColors[e.toLowerCase()]}"></span>
                 ${e}
             `).join(', ')}</td>
         `;

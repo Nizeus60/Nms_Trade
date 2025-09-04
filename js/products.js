@@ -1,5 +1,5 @@
 console.log('products.js loaded');
-const products = {
+window.products = {
     "Decrypted User Data|Données utilisateur décryptées": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"], avgPrice: 15000 },
     "Star Silk|Soie stellaire": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"], avgPrice: 12000 },
     "Comet Droplets|Gouttelettes de comète": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"], avgPrice: 18000 },

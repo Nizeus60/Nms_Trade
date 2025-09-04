@@ -181,7 +181,7 @@ function displaySystems() {
         systemsList.innerHTML = `<div class="no-result">${translations[currentLanguage].noResult}</div>`;
         return;
     }
-    savedSystems.forEach(sys => {
+    savedSystems.forEach((sys, index) => {
         const card = document.createElement('div');
         card.className = 'system-card';
         card.innerHTML = `
@@ -189,11 +189,24 @@ function displaySystems() {
                 <div class="system-name">${sys.name}</div>
                 <div class="system-coords">${sys.coordinates}</div>
             </div>
-            <div>Économie: ${sys.economy}</div>
+            <div>
+                <span class="economy-dot" style="background-color: ${economyColors[sys.economy.toLowerCase()]}"></span>
+                Économie: ${sys.economy}
+            </div>
             <div>Achat: ${sys.buyPercent}% | Vente: ${sys.sellPercent}%</div>
             <div>Notes: ${sys.notes || '-'}</div>
+            <button class="delete-btn" data-index="${index}">Supprimer</button>
         `;
         systemsList.appendChild(card);
+    });
+    // Ajouter les écouteurs pour les boutons de suppression
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = e.target.dataset.index;
+            savedSystems.splice(index, 1);
+            localStorage.setItem('nmsSavedSystems', JSON.stringify(savedSystems));
+            displaySystems();
+        });
     });
 }
 
@@ -286,154 +299,4 @@ function displaySuggestions(query) {
             `;
             suggestionItem.addEventListener('click', () => {
                 console.log('Suggestion clicked:', name);
-                document.getElementById('productSearch').value = name;
-                suggestions.innerHTML = '';
-                searchProduct(name);
-            });
-            suggestions.appendChild(suggestionItem);
-        });
-        console.log('Suggestions HTML:', suggestions.innerHTML);
-    } else {
-        console.warn('No products available for suggestions');
-    }
-}
-
-// Afficher les résultats
-function displayResults(productKeys) {
-    console.log('Displaying results for products:', productKeys);
-    const resultsList = document.getElementById('resultsList');
-    if (!resultsList) {
-        console.error('Results list not found');
-        return;
-    }
-    resultsList.innerHTML = '';
-    if (productKeys.length === 0) {
-        resultsList.innerHTML = `<div class="no-result">${translations[currentLanguage].noResult}</div>`;
-        return;
-    }
-    productKeys.forEach(key => {
-        const product = window.products[key];
-        const name = key.split('|')[currentLanguage === 'en' ? 0 : 1];
-        const card = document.createElement('div');
-        card.className = 'system-card';
-        card.innerHTML = `
-            <div class="system-name">${name}</div>
-            <div>
-                <span class="economy-dot buy-economy" style="background-color: ${economyColors[product.economy]}"></span>
-                Acheter dans: ${product.economy.charAt(0).toUpperCase() + product.economy.slice(1)}
-            </div>
-            <div>
-                Vendre à: ${product.sellTo.map(e => `
-                    <span class="economy-dot sell-economy" style="background-color: ${economyColors[e.toLowerCase()]}"></span>
-                    ${e}
-                `).join(', ')}
-            </div>
-            <div>Prix moyen: ${product.avgPrice} unités</div>
-        `;
-        resultsList.appendChild(card);
-    });
-    console.log('Results HTML:', resultsList.innerHTML);
-}
-
-// Comparateur de systèmes
-function compareSystems(productKey) {
-    console.log('Comparing systems for product:', productKey);
-    const comparatorResults = document.getElementById('comparatorResults');
-    if (!comparatorResults) {
-        console.error('Comparator results not found');
-        return;
-    }
-    comparatorResults.innerHTML = '';
-    if (!productKey || !window.products[productKey]) {
-        comparatorResults.innerHTML = `<div class="no-result">${translations[currentLanguage].noResult}</div>`;
-        return;
-    }
-    const product = window.products[productKey];
-    const compatibleSystems = savedSystems.filter(sys => product.sellTo.includes(sys.economy.charAt(0).toUpperCase() + sys.economy.slice(1)));
-    if (compatibleSystems.length === 0) {
-        comparatorResults.innerHTML = `<div class="no-result">Aucun système compatible.</div>`;
-        return;
-    }
-    compatibleSystems.sort((a, b) => (b.sellPercent - b.buyPercent) - (a.sellPercent - a.buyPercent));
-    compatibleSystems.forEach(sys => {
-        const card = document.createElement('div');
-        card.className = 'system-card';
-        card.innerHTML = `
-            <div class="system-name">${sys.name}</div>
-            <div>Profit potentiel: ${sys.sellPercent - sys.buyPercent}%</div>
-            <div>Achat: ${sys.buyPercent}% | Vente: ${sys.sellPercent}%</div>
-        `;
-        comparatorResults.appendChild(card);
-    });
-}
-
-// Initialisation
-function initializeApp() {
-    console.log('Initializing app...');
-    generateStars();
-    updateTranslations();
-    displaySystems();
-
-    // Attacher les écouteurs pour la langue et la navigation
-    const langButtons = document.querySelectorAll('.lang-btn');
-    console.log('Found language buttons:', langButtons.length);
-    langButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => switchLanguage(btn.dataset.lang, e));
-    });
-
-    const navButtons = document.querySelectorAll('.nav-btn');
-    console.log('Found nav buttons:', navButtons.length);
-    navButtons.forEach(btn => {
-        btn.addEventListener('click', () => switchSection(btn.dataset.section));
-    });
-
-    // Attacher les écouteurs pour la recherche de produits
-    const productSearch = document.getElementById('productSearch');
-    const searchProductBtn = document.getElementById('searchProductBtn');
-    
-    if (productSearch) {
-        console.log('Attaching input listener to productSearch');
-        productSearch.addEventListener('input', () => {
-            const query = productSearch.value;
-            console.log('Input event triggered with query:', query);
-            displaySuggestions(query);
-        });
-    } else {
-        console.error('productSearch input not found');
-    }
-
-    if (searchProductBtn) {
-        console.log('Attaching click listener to searchProductBtn');
-        searchProductBtn.addEventListener('click', () => {
-            const query = productSearch.value;
-            console.log('Search button clicked with query:', query);
-            searchProduct(query);
-        });
-    } else {
-        console.error('searchProductBtn not found');
-    }
-
-    // Initialiser les ressources (délégué à resources.js)
-    if (typeof initializeResources === 'function') {
-        console.log('Initializing resources module...');
-        initializeResources();
-    } else {
-        console.error('initializeResources function not found');
-    }
-
-    // Supprimer les écouteurs redondants ici, laissés à resources.js
-    // Attacher les écouteurs pour l'ajout de systèmes
-    addSystemListeners();
-}
-
-// Exécuter l'initialisation pour deviceready ou DOMContentLoaded
-document.addEventListener('deviceready', () => {
-    console.log('Cordova deviceready fired');
-    initializeApp();
-}, false);
-
-// Fallback pour les tests hors Cordova
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded fired (fallback)');
-    initializeApp();
-}, false);
+                document.getElement
