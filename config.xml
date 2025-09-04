@@ -1,8 +1,29 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.nmstrading.app" version="1.0.0">
+<widget id="com.nmstrading.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>NMS Trading</name>
     <description>No Man's Sky Trading Tool</description>
-    <author email="ton@email.com">Ton Nom</author>
-    <platform name="android" />
+    <author email="etienne.ricco@laposte.net">Nizoz</author>
+
+    <!-- Plateforme Android -->
+    <platform name="android">
+        <!-- Autoriser l'accès à Internet -->
+        <allow-intent href="http://*/*" />
+        <allow-intent href="https://*/*" />
+        <access origin="*" />
+    </platform>
+
+    <!-- Préférences générales -->
     <preference name="permissions" value="none"/>
+    <preference name="Orientation" value="portrait" />
+    <preference name="Fullscreen" value="true" />
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="3000" />
+    <preference name="FadeSplashScreen" value="true" />
+    <preference name="FadeSplashScreenDuration" value="500" />
+
+    <!-- Icone et SplashScreen (optionnel si tu veux un rendu plus “pro”) -->
+    <!--
+    <icon src="res/icon/android/icon.png" />
+    <splash src="res/screen/android/screen.png" />
+    -->
 </widget>

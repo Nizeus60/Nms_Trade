@@ -1,532 +1,371 @@
 <!DOCTYPE html>
 <html lang="fr">
-<script type="text/javascript" src="cordova.js"></script>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Outil de Commerce No Man's Sky</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: radial-gradient(ellipse at 20% 50%, rgba(120,119,198,0.3) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 20%, rgba(255,119,198,0.2) 0%, transparent 50%),
-                        linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0e1b3e 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #e8eaed;
-        }
-
-        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
-        .container {
-            max-width: 900px; margin: 0 auto;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px; padding: 30px;
-            box-shadow: 0 0 50px rgba(59, 130, 246, 0.1);
-            position: relative; z-index: 10;
-        }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-        
-        h1 {
-            font-size: 2.2em; font-weight: 300;
-            background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            letter-spacing: 2px; flex: 1; text-align: center;
-        }
-
-        .lang-switch {
-            display: flex; background: rgba(30, 41, 59, 0.8);
-            border-radius: 25px; padding: 4px;
-            border: 1px solid rgba(148, 163, 184, 0.2);
-        }
-        
-        .lang-btn {
-            padding: 8px 16px; border: none; background: transparent;
-            color: #94a3b8; border-radius: 20px; cursor: pointer;
-            transition: all 0.3s ease; font-size: 14px; font-weight: 600;
-        }
-        .lang-btn.active {
-            background: linear-gradient(45deg, #3b82f6, #6366f1);
-            color: white; box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
-        }
-
-        .search-container { display: flex; gap: 10px; margin-bottom: 30px; position: relative; }
-        
-        input[type="text"] {
-            flex: 1; padding: 15px 20px; font-size: 16px;
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 12px; color: #e8eaed;
-            outline: none; transition: all 0.3s ease;
-        }
-        input[type="text"]:focus { border-color: #60a5fa; box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
-        input[type="text"]::placeholder { color: #94a3b8; }
-
-        .search-btn {
-            padding: 15px 25px;
-            background: linear-gradient(45deg, #3b82f6, #6366f1);
-            border: none; border-radius: 12px; color: white;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-        }
-        .search-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4); }
-
-        .suggestions {
-            position: absolute; top: 100%; left: 0; right: 70px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(148, 163, 184, 0.2);
-            border-radius: 12px; backdrop-filter: blur(10px);
-            max-height: 300px; overflow-y: auto; z-index: 1000;
-            display: none; margin-top: 5px;
-        }
-        
-        .suggestion-item {
-            padding: 12px 20px; cursor: pointer;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-            display: flex; justify-content: space-between; align-items: center;
-            transition: background-color 0.2s;
-        }
-        .suggestion-item:hover { background: rgba(51, 65, 85, 0.5); }
-        .suggestion-item:last-child { border-bottom: none; }
-
-        .category-badge {
-            padding: 4px 10px; border-radius: 20px;
-            font-size: 11px; font-weight: bold; color: white;
-        }
-
-        .result-section { display: none; animation: fadeInUp 0.6s ease; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        .product-header {
-            text-align: center; margin-bottom: 25px; padding: 20px;
-            background: rgba(51, 65, 85, 0.3); border-radius: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.1);
-        }
-        .product-name { font-size: 24px; font-weight: 600; margin-bottom: 10px; color: #f8fafc; }
-
-        .sell-info {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 12px; padding: 25px; margin: 20px 0;
-        }
-        .sell-info h3 { margin-bottom: 20px; color: #60a5fa; font-size: 18px; font-weight: 600; }
-
-        .economy-list { display: grid; gap: 12px; }
-        .economy-item {
-            display: flex; align-items: center; padding: 15px;
-            background: rgba(51, 65, 85, 0.4); border-radius: 10px;
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            transition: all 0.3s ease;
-        }
-        .economy-item:hover { background: rgba(51, 65, 85, 0.6); transform: translateX(5px); }
-        .economy-icon {
-            width: 12px; height: 12px; border-radius: 50%;
-            margin-right: 15px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        .tips {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1));
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 12px; padding: 20px; margin-top: 20px;
-        }
-        .tips h3 { color: #a78bfa; margin-bottom: 15px; font-size: 16px; }
-        .tips ul { list-style: none; padding: 0; }
-        .tips li { padding: 8px 0; color: #cbd5e1; position: relative; padding-left: 20px; }
-        .tips li:before { content: '•'; color: #60a5fa; position: absolute; left: 0; }
-
-        .clear-btn {
-            background: linear-gradient(45deg, #ef4444, #f97316);
-            color: white; border: none; padding: 12px 24px;
-            border-radius: 10px; cursor: pointer; font-size: 14px;
-            font-weight: 600; margin-top: 20px; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-        }
-        .clear-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
-
-        .no-result {
-            text-align: center; color: #94a3b8; font-size: 18px;
-            padding: 40px 20px; background: rgba(30, 41, 59, 0.3);
-            border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        /* Couleurs des économies */
-        .trading { background: #10b981; }
-        .manufacturing { background: #f59e0b; }
-        .technology { background: #3b82f6; }
-        .power { background: #ef4444; }
-        .mining { background: #f97316; }
-        .scientific { background: #8b5cf6; }
-        .materials { background: #ec4899; }
-        .pirate { background: #64748b; }
-
-        @media (max-width: 700px) {
-            .header { flex-direction: column; text-align: center; }
-            h1 { font-size: 1.8em; margin-bottom: 15px; }
-            .search-container { flex-direction: column; }
-            .suggestions { right: 0; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Outil de Commerce No Man's Sky</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(ellipse at 20% 50%, rgba(120,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(255,119,198,0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0e1b3e 100%);
+    min-height: 100vh; padding: 20px; color: #e8eaed;
+}
+.stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
+@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+.container {
+    max-width: 900px; margin: 0 auto; background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 16px; padding: 30px; padding-bottom: 90px;
+    box-shadow: 0 0 50px rgba(59, 130, 246, 0.1); position: relative; z-index: 10;
+}
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+h1 {
+    font-size: 2.2em; font-weight: 300;
+    background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px; flex: 1; text-align: center;
+}
+.lang-switch { display: flex; background: rgba(30, 41, 59, 0.8); border-radius: 25px; padding: 4px; }
+.lang-btn {
+    padding: 8px 16px; border: none; background: transparent; color: #94a3b8;
+    border-radius: 20px; cursor: pointer; transition: all 0.3s ease; font-size: 14px; font-weight: 600;
+}
+.lang-btn.active { background: linear-gradient(45deg, #3b82f6, #6366f1); color: white; }
+.page-section { display: none; animation: fadeInUp 0.6s ease; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.search-container { display: flex; gap: 10px; margin-bottom: 30px; position: relative; }
+input[type="text"], input[type="number"], select, textarea {
+    width: 100%; padding: 12px 20px; font-size: 16px; background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; color: #e8eaed; outline: none;
+}
+input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus { border-color: #60a5fa; box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
+.search-btn, .primary-btn {
+    padding: 15px 25px; background: linear-gradient(45deg, #3b82f6, #6366f1);
+    border: none; border-radius: 12px; color: white; font-size: 16px; cursor: pointer;
+}
+.secondary-btn {
+    padding: 12px 24px; background: rgba(51, 65, 85, 0.6); border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 8px; color: #e8eaed; cursor: pointer;
+}
+.suggestions {
+    position: absolute; top: 100%; left: 0; right: 70px; background: rgba(15, 23, 42, 0.95);
+    border-radius: 12px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none; margin-top: 5px;
+}
+.suggestion-item { padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; transition: background-color 0.2s; }
+.suggestion-item:hover { background: rgba(51, 65, 85, 0.5); }
+.system-form { background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 25px; margin: 20px 0; }
+.form-group { margin-bottom: 20px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.systems-list { margin-top: 20px; }
+.system-card {
+    background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 20px; margin-bottom: 15px;
+}
+.system-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.system-name { font-size: 18px; font-weight: 600; color: #f8fafc; }
+.system-coords { color: #60a5fa; font-family: monospace; font-size: 12px; }
+.bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px); border-top: 1px solid rgba(148, 163, 184, 0.2);
+    display: flex; justify-content: space-around; padding: 10px; z-index: 1000;
+}
+.nav-btn { background: none; border: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; padding: 8px 12px; border-radius: 8px; cursor: pointer; min-width: 60px; }
+.nav-btn:hover, .nav-btn.active { color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
+.nav-icon { font-size: 20px; margin-bottom: 4px; }
+.nav-label { font-size: 11px; font-weight: 500; }
+.no-result { text-align: center; color: #94a3b8; padding: 40px 20px; background: rgba(30, 41, 59, 0.3); border-radius: 12px; }
+@media (max-width: 700px) {
+    .header { flex-direction: column; }
+    .search-container { flex-direction: column; }
+    .form-row { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
-    <div class="stars" id="stars"></div>
-    
-    <div class="container">
-        <div class="header">
-            <h1 id="mainTitle">✦ COMMERCE GALACTIQUE ✦</h1>
-            <div class="lang-switch">
-                <button class="lang-btn active" onclick="switchLanguage('fr')">🇫🇷 FR</button>
-                <button class="lang-btn" onclick="switchLanguage('en')">🇬🇧 EN</button>
-            </div>
-        </div>
-        
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="">
-            <button class="search-btn" onclick="performSearch()">
-                <span id="searchBtnText">🔍 Chercher</span>
-            </button>
-            <div id="suggestions" class="suggestions"></div>
-        </div>
+<div class="stars" id="stars"></div>
 
-        <div id="resultSection" class="result-section"></div>
+<div class="container">
+    <div class="header">
+        <h1 id="mainTitle">✦ COMMERCE GALACTIQUE ✦</h1>
+        <div class="lang-switch">
+            <button class="lang-btn active" onclick="switchLanguage('fr', event)">🇫🇷 FR</button>
+            <button class="lang-btn" onclick="switchLanguage('en', event)">🇬🇧 EN</button>
+        </div>
     </div>
 
-    <script>
-        let currentLanguage = 'fr';
+    <!-- Recherche -->
+    <div id="searchPage" class="page-section" style="display: block;">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="">
+            <button class="search-btn" onclick="performSearch()"><span id="searchBtnText">🔍 Chercher</span></button>
+            <div id="suggestions" class="suggestions"></div>
+        </div>
+        <div id="resultSection"></div>
+    </div>
 
-        const translations = {
-            fr: {
-                title: "✦ COMMERCE GALACTIQUE ✦",
-                placeholder: "Rechercher un produit (ex: Piston, Ion Sphere, Star Silk...)",
-                searchBtn: "🔍 Chercher",
-                sellTitle: "💰 Vendre dans ces économies pour profit maximum",
-                producedBy: "Produit par:",
-                tipsTitle: "💡 Conseils de trading",
-                tip1: "Utilise le scanner économique pour identifier les systèmes",
-                tip2: "Cherche des bonus de +20% à +30% pour vendre",
-                tip3: "Les avant-postes commerciaux offrent de meilleurs prix que les stations",
-                tip4: "Vends tout ton stock d'un coup pour éviter la baisse des prix",
-                tip5: "Les systèmes riches ont plus de stock disponible",
-                newSearch: "🔄 Nouvelle recherche",
-                notFound: "❌ Produit non trouvé",
-                checkSpelling: "Vérifiez l'orthographe ou essayez avec un nom plus court.",
-                examples: "Exemples :",
-                tryAgain: "🔄 Essayer à nouveau",
-                enterProduct: "Veuillez entrer le nom d'un produit",
-                economy: "Économie",
-                economies: {
-                    "Trading": "Marchande", "Manufacturing": "Fabrication", "Technology": "High-tech",
-                    "Power Generation": "Génération d'énergie", "Mining": "Minière", "Scientific": "Scientifique",
-                    "Advanced Materials": "Alliages avancés", "Any Regulated System": "Tout système régulé", "Pirate": "Pirate"
-                }
-            },
-            en: {
-                title: "✦ GALACTIC TRADE ✦",
-                placeholder: "Search for a product (e.g: Piston, Ion Sphere, Star Silk...)",
-                searchBtn: "🔍 Search",
-                sellTitle: "💰 Sell in these economies for maximum profit",
-                producedBy: "Produced by:",
-                tipsTitle: "💡 Trading tips",
-                tip1: "Use the economy scanner to identify systems",
-                tip2: "Look for +20% to +30% sell bonuses",
-                tip3: "Trading posts offer better prices than space stations",
-                tip4: "Sell all your stock at once to avoid price drops",
-                tip5: "Wealthy systems have more stock available",
-                newSearch: "🔄 New search",
-                notFound: "❌ Product not found",
-                checkSpelling: "Check spelling or try with a shorter name.",
-                examples: "Examples:",
-                tryAgain: "🔄 Try again",
-                enterProduct: "Please enter a product name",
-                economy: "Economy",
-                economies: {
-                    "Trading": "Trading", "Manufacturing": "Manufacturing", "Technology": "Technology",
-                    "Power Generation": "Power Generation", "Mining": "Mining", "Scientific": "Scientific",
-                    "Advanced Materials": "Advanced Materials", "Any Regulated System": "Any Regulated System", "Pirate": "Pirate"
-                }
-            }
-        };
+    <!-- Systèmes -->
+    <div id="systemsPage" class="page-section">
+        <h2 id="systemsTitle">📡 Mes Systèmes Sauvegardés</h2>
+        <button class="primary-btn" onclick="showAddForm()" id="addSystemBtn">➕ Ajouter un système</button>
+        <div id="systemsList" class="systems-list"></div>
+    </div>
 
-        const products = {
-            "Decrypted User Data|Données utilisateur décryptées": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"] },
-            "Star Silk|Soie stellaire": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"] },
-            "Comet Droplets|Gouttelettes de comète": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"] },
-            "Ion Sphere|Sphère ionique": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"] },
-            "Teleport Coordinators|Coordinateurs de téléportation": { economy: "trading", sellTo: ["Advanced Materials", "Scientific"] },
-            "Enormous Metal Cog|Énorme rouage en métal": { economy: "manufacturing", sellTo: ["Technology", "Power Generation"] },
-            "Non-Stick Piston|Piston antiadhésif": { economy: "manufacturing", sellTo: ["Technology", "Power Generation"] },
-            "Six-Pronged Mesh Decoupler|Découpleur de maille à six branches": { economy: "manufacturing", sellTo: ["Technology", "Power Generation"] },
-            "Holographic Crankshaft|Vilebrequin holographique": { economy: "manufacturing", sellTo: ["Technology", "Power Generation"] },
-            "High Capacity Vector Compressor|Compresseur vectoriel haute capacité": { economy: "manufacturing", sellTo: ["Technology", "Power Generation"] },
-            "Spark Canister|Bidon d'étincelles": { economy: "technology", sellTo: ["Power Generation", "Mining"] },
-            "Industrial-Grade Battery|Batterie industrielle": { economy: "technology", sellTo: ["Power Generation", "Mining"] },
-            "Ohmic Gel|Gel ohmique": { economy: "technology", sellTo: ["Power Generation", "Mining"] },
-            "Experimental Power Fluid|Fluide d'alimentation expérimental": { economy: "technology", sellTo: ["Power Generation", "Mining"] },
-            "Fusion Core|Noyau de fusion": { economy: "technology", sellTo: ["Power Generation", "Mining"] },
-            "Superconductor|Supraconducteur": { economy: "power", sellTo: ["Mining", "Manufacturing"] },
-            "Cryogenic Pump|Pompe cryogénique": { economy: "power", sellTo: ["Mining", "Manufacturing"] },
-            "Thermic Condensate|Condensat thermique": { economy: "power", sellTo: ["Mining", "Manufacturing"] },
-            "Enriched Carbon|Carbone enrichi": { economy: "power", sellTo: ["Mining", "Manufacturing"] },
-            "Nitrogen Salt|Sel d'azote": { economy: "power", sellTo: ["Mining", "Manufacturing"] },
-            "Dirt|Terre": { economy: "mining", sellTo: ["Manufacturing", "Technology"] },
-            "Unrefined Pyrite Grease|Graisse de pyrite non raffinée": { economy: "mining", sellTo: ["Manufacturing", "Technology"] },
-            "Bromide Salt|Sel de bromure": { economy: "mining", sellTo: ["Manufacturing", "Technology"] },
-            "Polychromatic Zirconium|Zirconium polychromatique": { economy: "mining", sellTo: ["Manufacturing", "Technology"] },
-            "Re-latticed Arc Crystal|Cristal d'arc re-réticulé": { economy: "mining", sellTo: ["Manufacturing", "Technology"] },
-            "De-Scented Pheromone Bottle|Flacon de phéromone désodorisée": { economy: "scientific", sellTo: ["Trading", "Advanced Materials"] },
-            "Neutron Microscope|Microscope à neutrons": { economy: "scientific", sellTo: ["Trading", "Advanced Materials"] },
-            "Instability Injector|Injecteur d'instabilité": { economy: "scientific", sellTo: ["Trading", "Advanced Materials"] },
-            "Organic Piping|Tuyauterie organique": { economy: "scientific", sellTo: ["Trading", "Advanced Materials"] },
-            "Neural Duct|Conduit neural": { economy: "scientific", sellTo: ["Trading", "Advanced Materials"] },
-            "Decommissioned Circuit Board|Carte de circuit déclassée": { economy: "materials", sellTo: ["Scientific", "Trading"] },
-            "Welding Soap|Savon de soudage": { economy: "materials", sellTo: ["Scientific", "Trading"] },
-            "Ion Capacitor|Condensateur ionique": { economy: "materials", sellTo: ["Scientific", "Trading"] },
-            "Autonomous Positioning Unit|Unité de positionnement autonome": { economy: "materials", sellTo: ["Scientific", "Trading"] },
-            "Quantum Accelerator|Accélérateur quantique": { economy: "materials", sellTo: ["Scientific", "Trading"] },
-            "Blood Salt|Sel de sang": { economy: "pirate", sellTo: ["Any Regulated System"] },
-            "Stolen DNA Samples|Échantillons ADN volés": { economy: "pirate", sellTo: ["Any Regulated System"] },
-            "Moon Ether|Éther lunaire": { economy: "pirate", sellTo: ["Any Regulated System"] },
-            "Prismatic Feathers|Plumes prismatiques": { economy: "pirate", sellTo: ["Any Regulated System"] },
-            "GrahGrah|GrahGrah": { economy: "pirate", sellTo: ["Any Regulated System"] },
-            "Counterfeit Circuits|Circuits contrefaits": { economy: "pirate", sellTo: ["Any Regulated System"] },
-            "Banned Weapons|Armes interdites": { economy: "pirate", sellTo: ["Any Regulated System"] },
-            "First Spawn Relics|Reliques du premier spawn": { economy: "pirate", sellTo: ["Any Regulated System"] }
-        };
-
-        const economyColors = {
-            "Trading": "#10b981", "Manufacturing": "#f59e0b", "Technology": "#3b82f6",
-            "Power Generation": "#ef4444", "Mining": "#f97316", "Scientific": "#8b5cf6",
-            "Advanced Materials": "#ec4899", "Any Regulated System": "#64748b"
-        };
-
-        function switchLanguage(lang) {
-            currentLanguage = lang;
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            updateTexts();
-        }
-
-        function updateTexts() {
-            const t = translations[currentLanguage];
-            document.getElementById('mainTitle').textContent = t.title;
-            document.getElementById('searchInput').placeholder = t.placeholder;
-            document.getElementById('searchBtnText').textContent = t.searchBtn;
-        }
-
-        function getCurrentProductName(productKey) {
-            const [enName, frName] = productKey.split('|');
-            return currentLanguage === 'en' ? enName : (frName || enName);
-        }
-
-        function searchProducts(query) {
-            return Object.keys(products).filter(productKey => {
-                const [enName, frName] = productKey.split('|');
-                const searchName = currentLanguage === 'en' ? enName : (frName || enName);
-                return searchName.toLowerCase().includes(query.toLowerCase());
-            });
-        }
-
-        function generateStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.width = Math.random() * 3 + 1 + 'px';
-                star.style.height = star.style.width;
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-
-        function showSuggestions() {
-            const input = document.getElementById('searchInput');
-            const suggestions = document.getElementById('suggestions');
-            const query = input.value.trim();
-
-            if (query.length < 2) {
-                suggestions.style.display = 'none';
-                return;
-            }
-
-            const matches = searchProducts(query).slice(0, 8);
-
-            if (matches.length > 0) {
-                suggestions.innerHTML = matches.map(productKey => {
-                    const productName = getCurrentProductName(productKey);
-                    const economyType = translations[currentLanguage].economies[getEconomyDisplayName(products[productKey].economy)];
-                    return `
-                        <div class="suggestion-item" onclick="selectProduct('${productKey.replace(/'/g, "\\'")}')">
-                            <span>${productName}</span>
-                            <span class="category-badge ${products[productKey].economy}">${economyType}</span>
-                        </div>
-                    `;
-                }).join('');
-                suggestions.style.display = 'block';
-            } else {
-                suggestions.style.display = 'none';
-            }
-        }
-
-        function getEconomyDisplayName(economy) {
-            const economyMap = {
-                'trading': 'Trading', 'manufacturing': 'Manufacturing', 'technology': 'Technology',
-                'power': 'Power Generation', 'mining': 'Mining', 'scientific': 'Scientific',
-                'materials': 'Advanced Materials', 'pirate': 'Pirate'
-            };
-            return economyMap[economy] || economy;
-        }
-
-        function performSearch() {
-            const input = document.getElementById('searchInput');
-            const query = input.value.trim();
-            const t = translations[currentLanguage];
-            
-            if (!query) {
-                alert(t.enterProduct);
-                return;
-            }
-
-            const matches = searchProducts(query);
-            
-            if (matches.length === 0) {
-                showNoResult();
-            } else if (matches.length === 1) {
-                selectProduct(matches[0]);
-            } else {
-                const exactMatch = matches.find(productKey => {
-                    const productName = getCurrentProductName(productKey);
-                    return productName.toLowerCase() === query.toLowerCase();
-                });
-                
-                if (exactMatch) {
-                    selectProduct(exactMatch);
-                } else {
-                    showSuggestions();
-                }
-            }
-        }
-
-        function selectProduct(productKey) {
-            const product = products[productKey];
-            const suggestions = document.getElementById('suggestions');
-            const resultSection = document.getElementById('resultSection');
-            const t = translations[currentLanguage];
-            
-            const productName = getCurrentProductName(productKey);
-
-            suggestions.style.display = 'none';
-            document.getElementById('searchInput').value = productName;
-
-            const sellLocations = product.sellTo.map(economy => {
-                const translatedEconomy = t.economies[economy] || economy;
-                const color = economyColors[economy] || '#64748b';
-                return `
-                    <div class="economy-item">
-                        <div class="economy-icon" style="background-color: ${color}"></div>
-                        <strong>${t.economy} ${translatedEconomy}</strong>
-                    </div>
-                `;
-            }).join('');
-
-            const productEconomyType = t.economies[getEconomyDisplayName(product.economy)];
-
-            resultSection.innerHTML = `
-                <div class="product-header">
-                    <div class="product-name">${productName}</div>
-                    <span class="category-badge ${product.economy}">${t.producedBy} ${productEconomyType}</span>
+    <!-- Ajouter système -->
+    <div id="addSystemPage" class="page-section">
+        <h2 id="addSystemTitle">➕ Nouveau Système</h2>
+        <form id="addSystemForm" class="system-form">
+            <div class="form-group">
+                <label id="systemNameLabel">Nom du système:</label>
+                <input type="text" id="systemName" required>
+            </div>
+            <div class="form-group">
+                <label id="economyTypeLabel">Type d'économie:</label>
+                <select id="economyType" required>
+                    <option value="">Sélectionner...</option>
+                    <option value="trading">Marchande/Trading</option>
+                    <option value="manufacturing">Fabrication/Manufacturing</option>
+                    <option value="technology">High-tech/Technology</option>
+                    <option value="power">Génération d'énergie/Power</option>
+                    <option value="mining">Minière/Mining</option>
+                    <option value="scientific">Scientifique/Scientific</option>
+                    <option value="materials">Alliages avancés/Materials</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label id="coordinatesLabel">Coordonnées:</label>
+                <input type="text" id="coordinates" placeholder="0427:0081:0D6D:0227" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label id="buyPercentLabel">% Achat:</label>
+                    <input type="number" id="buyPercent" placeholder="-23" min="-100" max="100" required>
                 </div>
-                
-                <div class="sell-info">
-                    <h3>${t.sellTitle}</h3>
-                    <div class="economy-list">
-                        ${sellLocations}
-                    </div>
+                <div class="form-group">
+                    <label id="sellPercentLabel">% Vente:</label>
+                    <input type="number" id="sellPercent" placeholder="+47" min="-100" max="100" required>
                 </div>
-                
-                <div class="tips">
-                    <h3>${t.tipsTitle}</h3>
-                    <ul>
-                        <li>${t.tip1}</li>
-                        <li>${t.tip2}</li>
-                        <li>${t.tip3}</li>
-                        <li>${t.tip4}</li>
-                        <li>${t.tip5}</li>
-                    </ul>
-                </div>
-                
-                <button class="clear-btn" onclick="clearSearch()">${t.newSearch}</button>
-            `;
-            
-            resultSection.style.display = 'block';
-            resultSection.scrollIntoView({ behavior: 'smooth' });
-        }
+            </div>
+            <div class="form-group">
+                <label id="notesLabel">Notes:</label>
+                <textarea id="systemNotes" placeholder="Notes optionnelles"></textarea>
+            </div>
+            <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                <button type="button" class="secondary-btn" onclick="showPage('systems')" id="cancelBtn">Annuler</button>
+                <button type="submit" class="primary-btn" id="saveSystemBtn">💾 Sauvegarder</button>
+            </div>
+        </form>
+    </div>
 
-        function showNoResult() {
-            const resultSection = document.getElementById('resultSection');
-            const t = translations[currentLanguage];
-            
-            const examples = currentLanguage === 'en' 
-                ? '"Piston", "Ion", "Star", "Dirt", "Cog"'
-                : '"Piston", "Ion", "Star", "Terre", "Rouage"';
-                
-            resultSection.innerHTML = `
-                <div class="no-result">
-                    <h3>${t.notFound}</h3>
-                    <p>${t.checkSpelling}</p>
-                    <p><strong>${t.examples}</strong> ${examples}</p>
-                </div>
-                <button class="clear-btn" onclick="clearSearch()">${t.tryAgain}</button>
-            `;
-            resultSection.style.display = 'block';
-        }
+    <!-- Comparateur -->
+    <div id="comparatorPage" class="page-section">
+        <h2 id="comparatorTitle">📊 Comparateur de Systèmes</h2>
+        <div class="search-container">
+            <input type="text" id="productSearchInput" placeholder="">
+            <button class="search-btn" onclick="searchInSystems()" id="searchProductBtn">🔍</button>
+        </div>
+        <div id="comparisonResults"></div>
+    </div>
+</div>
 
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('suggestions').style.display = 'none';
-            document.getElementById('resultSection').style.display = 'none';
-            document.getElementById('searchInput').focus();
-        }
+<nav class="bottom-nav">
+    <button class="nav-btn active" onclick="showPage('search')" id="navSearch">
+        <span class="nav-icon">🔍</span>
+        <span class="nav-label" id="navSearchLabel">Recherche</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('systems')" id="navSystems">
+        <span class="nav-icon">📡</span>
+        <span class="nav-label" id="navSystemsLabel">Systèmes</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('comparator')" id="navComparator">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label" id="navComparatorLabel">Comparer</span>
+    </button>
+</nav>
 
-        document.getElementById('searchInput').addEventListener('input', showSuggestions);
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') performSearch();
-        });
+<script>
+let currentLanguage = 'fr';
+let savedSystems = JSON.parse(localStorage.getItem('nmsSavedSystems')) || [];
 
-        document.addEventListener('click', function(e) {
-            const searchContainer = document.querySelector('.search-container');
-            if (!searchContainer.contains(e.target)) {
-                document.getElementById('suggestions').style.display = 'none';
-            }
-        });
-
-        generateStars();
-        updateTexts();
-        document.getElementById('searchInput').focus();
-		
-		// Pub AdMob - Ajoute ça à la fin de ton script JavaScript
-document.addEventListener('deviceready', function() {
-    // Configuration de la pub interstitielle
-    if (typeof admob !== 'undefined') {
-        admob.interstitial.config({
-            id: 'ca-app-pub-5844592247889255/2395799592',  // Remplace par ton ID AdMob
-            autoShow: false
-        });
-        
-        // Prépare et affiche la pub au lancement
-        admob.interstitial.prepare();
-        setTimeout(() => {
-            admob.interstitial.show();
-        }, 2000); // Attend 2 secondes puis affiche la pub
+const translations = {
+    fr: { title:"✦ COMMERCE GALACTIQUE ✦", placeholder:"Rechercher un produit...", searchBtn:"🔍 Chercher",
+        navSearch:"Recherche", navSystems:"Systèmes", navComparator:"Comparer",
+        systemsTitle:"📡 Mes Systèmes Sauvegardés", addSystemBtn:"➕ Ajouter un système",
+        addSystemTitle:"➕ Nouveau Système", systemNameLabel:"Nom du système:", economyTypeLabel:"Type d'économie:",
+        coordinatesLabel:"Coordonnées:", buyPercentLabel:"% Achat:", sellPercentLabel:"% Vente:", notesLabel:"Notes:",
+        cancelBtn:"Annuler", saveSystemBtn:"💾 Sauvegarder", comparatorTitle:"📊 Comparateur de Systèmes",
+        productSearchPlaceholder:"Chercher un produit...", searchProductBtn:"🔍 Chercher"
+    },
+    en: { title:"✦ GALACTIC TRADE ✦", placeholder:"Search product...", searchBtn:"🔍 Search",
+        navSearch:"Search", navSystems:"Systems", navComparator:"Compare",
+        systemsTitle:"📡 My Saved Systems", addSystemBtn:"➕ Add System",
+        addSystemTitle:"➕ New System", systemNameLabel:"System name:", economyTypeLabel:"Economy type:",
+        coordinatesLabel:"Coordinates:", buyPercentLabel:"Buy %:", sellPercentLabel:"Sell %:", notesLabel:"Notes:",
+        cancelBtn:"Cancel", saveSystemBtn:"💾 Save", comparatorTitle:"📊 Systems Comparator",
+        productSearchPlaceholder:"Search product...", searchProductBtn:"🔍 Search"
     }
-}, false);
-    </script>
+};
+
+const products = {
+    "Decrypted User Data|Données utilisateur décryptées": { economy:"trading", sellTo:["Advanced Materials","Scientific"] },
+    "Star Silk|Soie stellaire": { economy:"trading", sellTo:["Advanced Materials","Scientific"] },
+    "Ion Sphere|Sphère ionique": { economy:"trading", sellTo:["Advanced Materials","Scientific"] },
+    "Non-Stick Piston|Piston antiadhésif": { economy:"manufacturing", sellTo:["Technology","Power Generation"] },
+    "Enormous Metal Cog|Énorme rouage en métal": { economy:"manufacturing", sellTo:["Technology","Power Generation"] },
+    "Dirt|Terre": { economy:"mining", sellTo:["Manufacturing","Technology"] },
+    "Superconductor|Supraconducteur": { economy:"power", sellTo:["Mining","Manufacturing"] }
+};
+
+function generateStars() {
+    const starsContainer = document.getElementById('stars');
+    for(let i=0;i<100;i++){
+        const star=document.createElement('div');
+        star.className='star';
+        star.style.left=Math.random()*100+'%';
+        star.style.top=Math.random()*100+'%';
+        star.style.width=Math.random()*3+1+'px';
+        star.style.height=star.style.width;
+        star.style.animationDelay=Math.random()*3+'s';
+        starsContainer.appendChild(star);
+    }
+}
+
+function switchLanguage(lang,event){
+    currentLanguage=lang;
+    document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));
+    if(event) event.target.classList.add('active');
+    updateTexts();
+}
+
+function updateTexts(){
+    const t=translations[currentLanguage];
+    document.getElementById('mainTitle').textContent=t.title;
+    document.getElementById('searchInput').placeholder=t.placeholder;
+    document.getElementById('searchBtnText').textContent=t.searchBtn;
+    document.getElementById('navSearchLabel').textContent=t.navSearch;
+    document.getElementById('navSystemsLabel').textContent=t.navSystems;
+    document.getElementById('navComparatorLabel').textContent=t.navComparator;
+    document.getElementById('systemsTitle').textContent=t.systemsTitle;
+    document.getElementById('addSystemBtn').textContent=t.addSystemBtn;
+    document.getElementById('addSystemTitle').textContent=t.addSystemTitle;
+    document.getElementById('systemNameLabel').textContent=t.systemNameLabel;
+    document.getElementById('economyTypeLabel').textContent=t.economyTypeLabel;
+    document.getElementById('coordinatesLabel').textContent=t.coordinatesLabel;
+    document.getElementById('buyPercentLabel').textContent=t.buyPercentLabel;
+    document.getElementById('sellPercentLabel').textContent=t.sellPercentLabel;
+    document.getElementById('notesLabel').textContent=t.notesLabel;
+    document.getElementById('cancelBtn').textContent=t.cancelBtn;
+    document.getElementById('saveSystemBtn').textContent=t.saveSystemBtn;
+    document.getElementById('comparatorTitle').textContent=t.comparatorTitle;
+    document.getElementById('productSearchInput').placeholder=t.productSearchPlaceholder;
+    document.getElementById('searchProductBtn').textContent=t.searchProductBtn;
+}
+
+function showPage(page){
+    document.querySelectorAll('.page-section').forEach(p=>p.style.display='none');
+    if(page==='search') document.getElementById('searchPage').style.display='block';
+    else if(page==='systems') document.getElementById('systemsPage').style.display='block';
+    else if(page==='addSystem') document.getElementById('addSystemPage').style.display='block';
+    else if(page==='comparator') document.getElementById('comparatorPage').style.display='block';
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    if(page==='search') document.getElementById('navSearch').classList.add('active');
+    if(page==='systems') document.getElementById('navSystems').classList.add('active');
+    if(page==='comparator') document.getElementById('navComparator').classList.add('active');
+}
+
+function showAddForm(){
+    showPage('addSystem');
+    document.getElementById('addSystemForm').reset();
+}
+
+function saveSystems(){
+    localStorage.setItem('nmsSavedSystems',JSON.stringify(savedSystems));
+}
+
+function renderSystems(){
+    const container=document.getElementById('systemsList');
+    if(savedSystems.length===0){ container.innerHTML='<div class="no-result">Aucun système sauvegardé</div>'; return; }
+    container.innerHTML=savedSystems.map((s,i)=>`
+        <div class="system-card">
+            <div class="system-header">
+                <div>
+                    <div class="system-name">${s.name}</div>
+                    <div class="system-coords">${s.coordinates}</div>
+                </div>
+                <div>
+                    <button class="secondary-btn" onclick="deleteSystem(${i})">❌</button>
+                </div>
+            </div>
+            <p>💰 Achat: ${s.buyPercent}% | Vente: ${s.sellPercent}%</p>
+            ${s.notes ? `<p>📝 ${s.notes}</p>` : ''}
+        </div>
+    `).join('');
+}
+
+function deleteSystem(index){
+    if(!confirm("Supprimer ce système?")) return;
+    savedSystems.splice(index,1);
+    saveSystems();
+    renderSystems();
+}
+
+document.getElementById('addSystemForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    const name=document.getElementById('systemName').value.trim();
+    const economy=document.getElementById('economyType').value;
+    const coordinates=document.getElementById('coordinates').value.trim();
+    const buyPercent=parseFloat(document.getElementById('buyPercent').value);
+    const sellPercent=parseFloat(document.getElementById('sellPercent').value);
+    const notes=document.getElementById('systemNotes').value.trim();
+    if(isNaN(buyPercent) || buyPercent<-100 || buyPercent>100){ alert("Achat % invalide"); return; }
+    if(isNaN(sellPercent) || sellPercent<-100 || sellPercent>100){ alert("Vente % invalide"); return; }
+    savedSystems.push({name,economy,coordinates,buyPercent,sellPercent,notes});
+    saveSystems();
+    renderSystems();
+    showPage('systems');
+});
+
+function performSearch(){
+    const query=document.getElementById('searchInput').value.toLowerCase();
+    const resultSection=document.getElementById('resultSection');
+    if(!query){ resultSection.innerHTML=''; return; }
+    const matches=Object.keys(products).filter(p=>p.toLowerCase().includes(query));
+    if(matches.length===0){ resultSection.innerHTML='<div class="no-result">Aucun produit trouvé</div>'; return; }
+    const first=matches[0];
+    const prod=products[first];
+    resultSection.innerHTML=`<div class="system-card"><div><strong>${first}</strong></div>
+        <div>Économie: ${prod.economy}</div>
+        <div>Vendre à: ${prod.sellTo.join(", ")}</div>
+    </div>`;
+}
+
+function searchInSystems(){
+    const query=document.getElementById('productSearchInput').value.trim().toLowerCase();
+    const container=document.getElementById('comparisonResults');
+    if(!query){ container.innerHTML=''; return; }
+    const results=savedSystems.filter(s=>s.name.toLowerCase().includes(query));
+    if(results.length===0){ container.innerHTML='<div class="no-result">❌ Aucun système trouvé pour "'+query+'"</div>'; return; }
+    container.innerHTML=results.map(s=>`
+        <div class="system-card">
+            <div class="system-header">
+                <div>
+                    <div class="system-name">${s.name}</div>
+                    <div class="system-coords">${s.coordinates}</div>
+                </div>
+            </div>
+            <div style="color:#cbd5e1;">
+                <p>💰 Achat: ${s.buyPercent}% | Vente: ${s.sellPercent}%</p>
+                ${s.notes?`<p>📝 ${s.notes}</p>`:''}
+            </div>
+        </div>
+    `).join('');
+}
+
+generateStars();
+updateTexts();
+renderSystems();
+</script>
 </body>
 </html>
