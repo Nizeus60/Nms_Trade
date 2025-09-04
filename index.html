@@ -159,7 +159,13 @@
         </button>
     </div>
 
-    <script src="cordova.js"></script>
+    <!-- Charger cordova.js uniquement si Cordova est actif -->
+    <script>
+        if (window.cordova) {
+            document.write('<script src="cordova.js"><\/script>');
+        }
+    </script>
+    <script src="js/products.js"></script>
     <script src="js/app.js"></script>
     <script src="js/resources.js"></script>
 </body>
