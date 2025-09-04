@@ -5,17 +5,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    
     - uses: actions/setup-node@v4
       with:
         node-version: '18'
+    
     - name: Install Cordova
       run: npm install -g cordova
-    - name: Add Android platform
-      run: cordova platform add android
-    - name: Build APK
-      run: cordova build android
+    
+    - name: Create Cordova project
+      run: cordova create nms-app com.nmstrading.app "NMS Trading"
+    
+    - name: Copy files to Cordova www folder
+      run: |
+        cp index.html nms-app/www/
+        cp config.xml nms-app/
+    
+    - name: Change to project directory
+      working-directory: ./nms-app
+      run: |
+        cordova platform add android
+        cordova build android
+    
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: nms-trading-apk
-        path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        path: nms-app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
