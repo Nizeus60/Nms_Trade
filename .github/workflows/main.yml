@@ -1,35 +1,54 @@
-name: Build APK
-on: [push]
+name: Build NMS Trading APK
+
+on:
+  push:
+    branches: [ main ]   # ou la branche que tu utilises
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+    # 1️⃣ Récupérer le code
     - uses: actions/checkout@v4
-    
+
+    # 2️⃣ Installer Node.js
     - uses: actions/setup-node@v4
       with:
         node-version: '18'
-    
+
+    # 3️⃣ Installer Cordova globalement
     - name: Install Cordova
       run: npm install -g cordova
 
-    - name: Install AdMob plugin
-      run: npm install -g cordova-plugin-admob-free
-    
-    - name: Create Cordova project
-      run: cordova create nms-app com.nmstrading.app "NMS Trading"
-    
-    - name: Copy files to Cordova www folder
+    # 4️⃣ Installer plugins nécessaires (ex: AdMob)
+    - name: Install Cordova plugins
       run: |
-        cp index.html nms-app/www/
+        npm install -g cordova-plugin-admob-free
+        # ajouter d'autres plugins si besoin
+        # ex: cordova plugin add cordova-plugin-device
+
+    # 5️⃣ Créer le projet Cordova si inexistant
+    - name: Create Cordova project
+      run: |
+        if [ ! -d "nms-app" ]; then
+          cordova create nms-app com.nmstrading.app "NMS Trading"
+        fi
+
+    # 6️⃣ Copier tous les fichiers du projet dans www
+    - name: Copy project files
+      run: |
+        cp -r index.html style.css app.js assets nms-app/www/
         cp config.xml nms-app/
-    
-    - name: Change to project directory
+
+    # 7️⃣ Ajouter la plateforme Android et construire l'APK
+    - name: Build Android APK
       working-directory: ./nms-app
       run: |
-        cordova platform add android
-        cordova build android
-    
+        cordova platform add android || echo "Platform already added"
+        cordova build android --debug
+
+    # 8️⃣ Upload de l'APK généré comme artefact
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
