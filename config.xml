@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.nmstrading.app" version="1.0.0">
+    <name>NMS Trading</name>
+    <description>No Man's Sky Trading Tool</description>
+    <author email="ton@email.com">Ton Nom</author>
+    <platform name="android" />
+    <preference name="permissions" value="none"/>
+</widget>
