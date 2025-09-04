@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+<script type="text/javascript" src="cordova.js"></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -509,6 +510,23 @@
         generateStars();
         updateTexts();
         document.getElementById('searchInput').focus();
+		
+		// Pub AdMob - Ajoute ça à la fin de ton script JavaScript
+document.addEventListener('deviceready', function() {
+    // Configuration de la pub interstitielle
+    if (typeof admob !== 'undefined') {
+        admob.interstitial.config({
+            id: 'ca-app-pub-5844592247889255/2395799592',  // Remplace par ton ID AdMob
+            autoShow: false
+        });
+        
+        // Prépare et affiche la pub au lancement
+        admob.interstitial.prepare();
+        setTimeout(() => {
+            admob.interstitial.show();
+        }, 2000); // Attend 2 secondes puis affiche la pub
+    }
+}, false);
     </script>
 </body>
 </html>
