@@ -4,85 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Outil de Commerce No Man's Sky</title>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: 'Segoe UI', sans-serif;
-    background: radial-gradient(ellipse at 20% 50%, rgba(120,119,198,0.3) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, rgba(255,119,198,0.2) 0%, transparent 50%),
-                linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #0e1b3e 100%);
-    min-height: 100vh; padding: 20px; color: #e8eaed;
-}
-.stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-.star { position: absolute; background: white; border-radius: 50%; animation: twinkle 3s infinite; }
-@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-.container {
-    max-width: 900px; margin: 0 auto; background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.1);
-    border-radius: 16px; padding: 30px; padding-bottom: 90px;
-    box-shadow: 0 0 50px rgba(59, 130, 246, 0.1); position: relative; z-index: 10;
-}
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
-h1 {
-    font-size: 2.2em; font-weight: 300;
-    background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    letter-spacing: 2px; flex: 1; text-align: center;
-}
-.lang-switch { display: flex; background: rgba(30, 41, 59, 0.8); border-radius: 25px; padding: 4px; }
-.lang-btn {
-    padding: 8px 16px; border: none; background: transparent; color: #94a3b8;
-    border-radius: 20px; cursor: pointer; transition: all 0.3s ease; font-size: 14px; font-weight: 600;
-}
-.lang-btn.active { background: linear-gradient(45deg, #3b82f6, #6366f1); color: white; }
-.page-section { display: none; animation: fadeInUp 0.6s ease; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-.search-container { display: flex; gap: 10px; margin-bottom: 30px; position: relative; }
-input[type="text"], input[type="number"], select, textarea {
-    width: 100%; padding: 12px 20px; font-size: 16px; background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; color: #e8eaed; outline: none;
-}
-input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus { border-color: #60a5fa; box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
-.search-btn, .primary-btn {
-    padding: 15px 25px; background: linear-gradient(45deg, #3b82f6, #6366f1);
-    border: none; border-radius: 12px; color: white; font-size: 16px; cursor: pointer;
-}
-.secondary-btn {
-    padding: 12px 24px; background: rgba(51, 65, 85, 0.6); border: 1px solid rgba(148, 163, 184, 0.2);
-    border-radius: 8px; color: #e8eaed; cursor: pointer;
-}
-.suggestions {
-    position: absolute; top: 100%; left: 0; right: 70px; background: rgba(15, 23, 42, 0.95);
-    border-radius: 12px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none; margin-top: 5px;
-}
-.suggestion-item { padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; transition: background-color 0.2s; }
-.suggestion-item:hover { background: rgba(51, 65, 85, 0.5); }
-.system-form { background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 25px; margin: 20px 0; }
-.form-group { margin-bottom: 20px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.systems-list { margin-top: 20px; }
-.system-card {
-    background: rgba(30, 41, 59, 0.5); border-radius: 12px; padding: 20px; margin-bottom: 15px;
-}
-.system-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.system-name { font-size: 18px; font-weight: 600; color: #f8fafc; }
-.system-coords { color: #60a5fa; font-family: monospace; font-size: 12px; }
-.bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(10px); border-top: 1px solid rgba(148, 163, 184, 0.2);
-    display: flex; justify-content: space-around; padding: 10px; z-index: 1000;
-}
-.nav-btn { background: none; border: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; padding: 8px 12px; border-radius: 8px; cursor: pointer; min-width: 60px; }
-.nav-btn:hover, .nav-btn.active { color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
-.nav-icon { font-size: 20px; margin-bottom: 4px; }
-.nav-label { font-size: 11px; font-weight: 500; }
-.no-result { text-align: center; color: #94a3b8; padding: 40px 20px; background: rgba(30, 41, 59, 0.3); border-radius: 12px; }
-@media (max-width: 700px) {
-    .header { flex-direction: column; }
-    .search-container { flex-direction: column; }
-    .form-row { grid-template-columns: 1fr; }
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="stars" id="stars"></div>
@@ -96,7 +18,7 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:foc
         </div>
     </div>
 
-    <!-- Recherche -->
+    <!-- Recherche produits -->
     <div id="searchPage" class="page-section" style="display: block;">
         <div class="search-container">
             <input type="text" id="searchInput" placeholder="">
@@ -136,7 +58,7 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:foc
             </div>
             <div class="form-group">
                 <label id="coordinatesLabel">Coordonnées:</label>
-                <input type="text" id="coordinates" placeholder="0427:0081:0D6D:0227" required>
+                <input type="text" id="coordinates" placeholder="042700810D6D0227" required>
             </div>
             <div class="form-row">
                 <div class="form-group">
@@ -168,6 +90,22 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:foc
         </div>
         <div id="comparisonResults"></div>
     </div>
+
+    <!-- Ressources -->
+    <div id="resourcesPage" class="page-section">
+        <h2>⛏️ Ressources et Marché</h2>
+        <div class="search-container">
+            <input type="text" id="resourceSearchInput" placeholder="Chercher une ressource...">
+            <select id="resourceFilter">
+                <option value="">Tout type</option>
+                <option value="Metal">Métal</option>
+                <option value="Rare">Objet rare</option>
+                <option value="Product">Produit</option>
+            </select>
+            <button class="search-btn" onclick="renderResources()">🔍</button>
+        </div>
+        <div id="resourcesList"></div>
+    </div>
 </div>
 
 <nav class="bottom-nav">
@@ -183,189 +121,12 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:foc
         <span class="nav-icon">📊</span>
         <span class="nav-label" id="navComparatorLabel">Comparer</span>
     </button>
+    <button class="nav-btn" onclick="showPage('resources')" id="navResources">
+        <span class="nav-icon">⛏️</span>
+        <span class="nav-label">Ressources</span>
+    </button>
 </nav>
 
-<script>
-let currentLanguage = 'fr';
-let savedSystems = JSON.parse(localStorage.getItem('nmsSavedSystems')) || [];
-
-const translations = {
-    fr: { title:"✦ COMMERCE GALACTIQUE ✦", placeholder:"Rechercher un produit...", searchBtn:"🔍 Chercher",
-        navSearch:"Recherche", navSystems:"Systèmes", navComparator:"Comparer",
-        systemsTitle:"📡 Mes Systèmes Sauvegardés", addSystemBtn:"➕ Ajouter un système",
-        addSystemTitle:"➕ Nouveau Système", systemNameLabel:"Nom du système:", economyTypeLabel:"Type d'économie:",
-        coordinatesLabel:"Coordonnées:", buyPercentLabel:"% Achat:", sellPercentLabel:"% Vente:", notesLabel:"Notes:",
-        cancelBtn:"Annuler", saveSystemBtn:"💾 Sauvegarder", comparatorTitle:"📊 Comparateur de Systèmes",
-        productSearchPlaceholder:"Chercher un produit...", searchProductBtn:"🔍 Chercher"
-    },
-    en: { title:"✦ GALACTIC TRADE ✦", placeholder:"Search product...", searchBtn:"🔍 Search",
-        navSearch:"Search", navSystems:"Systems", navComparator:"Compare",
-        systemsTitle:"📡 My Saved Systems", addSystemBtn:"➕ Add System",
-        addSystemTitle:"➕ New System", systemNameLabel:"System name:", economyTypeLabel:"Economy type:",
-        coordinatesLabel:"Coordinates:", buyPercentLabel:"Buy %:", sellPercentLabel:"Sell %:", notesLabel:"Notes:",
-        cancelBtn:"Cancel", saveSystemBtn:"💾 Save", comparatorTitle:"📊 Systems Comparator",
-        productSearchPlaceholder:"Search product...", searchProductBtn:"🔍 Search"
-    }
-};
-
-const products = {
-    "Decrypted User Data|Données utilisateur décryptées": { economy:"trading", sellTo:["Advanced Materials","Scientific"] },
-    "Star Silk|Soie stellaire": { economy:"trading", sellTo:["Advanced Materials","Scientific"] },
-    "Ion Sphere|Sphère ionique": { economy:"trading", sellTo:["Advanced Materials","Scientific"] },
-    "Non-Stick Piston|Piston antiadhésif": { economy:"manufacturing", sellTo:["Technology","Power Generation"] },
-    "Enormous Metal Cog|Énorme rouage en métal": { economy:"manufacturing", sellTo:["Technology","Power Generation"] },
-    "Dirt|Terre": { economy:"mining", sellTo:["Manufacturing","Technology"] },
-    "Superconductor|Supraconducteur": { economy:"power", sellTo:["Mining","Manufacturing"] }
-};
-
-function generateStars() {
-    const starsContainer = document.getElementById('stars');
-    for(let i=0;i<100;i++){
-        const star=document.createElement('div');
-        star.className='star';
-        star.style.left=Math.random()*100+'%';
-        star.style.top=Math.random()*100+'%';
-        star.style.width=Math.random()*3+1+'px';
-        star.style.height=star.style.width;
-        star.style.animationDelay=Math.random()*3+'s';
-        starsContainer.appendChild(star);
-    }
-}
-
-function switchLanguage(lang,event){
-    currentLanguage=lang;
-    document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));
-    if(event) event.target.classList.add('active');
-    updateTexts();
-}
-
-function updateTexts(){
-    const t=translations[currentLanguage];
-    document.getElementById('mainTitle').textContent=t.title;
-    document.getElementById('searchInput').placeholder=t.placeholder;
-    document.getElementById('searchBtnText').textContent=t.searchBtn;
-    document.getElementById('navSearchLabel').textContent=t.navSearch;
-    document.getElementById('navSystemsLabel').textContent=t.navSystems;
-    document.getElementById('navComparatorLabel').textContent=t.navComparator;
-    document.getElementById('systemsTitle').textContent=t.systemsTitle;
-    document.getElementById('addSystemBtn').textContent=t.addSystemBtn;
-    document.getElementById('addSystemTitle').textContent=t.addSystemTitle;
-    document.getElementById('systemNameLabel').textContent=t.systemNameLabel;
-    document.getElementById('economyTypeLabel').textContent=t.economyTypeLabel;
-    document.getElementById('coordinatesLabel').textContent=t.coordinatesLabel;
-    document.getElementById('buyPercentLabel').textContent=t.buyPercentLabel;
-    document.getElementById('sellPercentLabel').textContent=t.sellPercentLabel;
-    document.getElementById('notesLabel').textContent=t.notesLabel;
-    document.getElementById('cancelBtn').textContent=t.cancelBtn;
-    document.getElementById('saveSystemBtn').textContent=t.saveSystemBtn;
-    document.getElementById('comparatorTitle').textContent=t.comparatorTitle;
-    document.getElementById('productSearchInput').placeholder=t.productSearchPlaceholder;
-    document.getElementById('searchProductBtn').textContent=t.searchProductBtn;
-}
-
-function showPage(page){
-    document.querySelectorAll('.page-section').forEach(p=>p.style.display='none');
-    if(page==='search') document.getElementById('searchPage').style.display='block';
-    else if(page==='systems') document.getElementById('systemsPage').style.display='block';
-    else if(page==='addSystem') document.getElementById('addSystemPage').style.display='block';
-    else if(page==='comparator') document.getElementById('comparatorPage').style.display='block';
-    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-    if(page==='search') document.getElementById('navSearch').classList.add('active');
-    if(page==='systems') document.getElementById('navSystems').classList.add('active');
-    if(page==='comparator') document.getElementById('navComparator').classList.add('active');
-}
-
-function showAddForm(){
-    showPage('addSystem');
-    document.getElementById('addSystemForm').reset();
-}
-
-function saveSystems(){
-    localStorage.setItem('nmsSavedSystems',JSON.stringify(savedSystems));
-}
-
-function renderSystems(){
-    const container=document.getElementById('systemsList');
-    if(savedSystems.length===0){ container.innerHTML='<div class="no-result">Aucun système sauvegardé</div>'; return; }
-    container.innerHTML=savedSystems.map((s,i)=>`
-        <div class="system-card">
-            <div class="system-header">
-                <div>
-                    <div class="system-name">${s.name}</div>
-                    <div class="system-coords">${s.coordinates}</div>
-                </div>
-                <div>
-                    <button class="secondary-btn" onclick="deleteSystem(${i})">❌</button>
-                </div>
-            </div>
-            <p>💰 Achat: ${s.buyPercent}% | Vente: ${s.sellPercent}%</p>
-            ${s.notes ? `<p>📝 ${s.notes}</p>` : ''}
-        </div>
-    `).join('');
-}
-
-function deleteSystem(index){
-    if(!confirm("Supprimer ce système?")) return;
-    savedSystems.splice(index,1);
-    saveSystems();
-    renderSystems();
-}
-
-document.getElementById('addSystemForm').addEventListener('submit',function(e){
-    e.preventDefault();
-    const name=document.getElementById('systemName').value.trim();
-    const economy=document.getElementById('economyType').value;
-    const coordinates=document.getElementById('coordinates').value.trim();
-    const buyPercent=parseFloat(document.getElementById('buyPercent').value);
-    const sellPercent=parseFloat(document.getElementById('sellPercent').value);
-    const notes=document.getElementById('systemNotes').value.trim();
-    if(isNaN(buyPercent) || buyPercent<-100 || buyPercent>100){ alert("Achat % invalide"); return; }
-    if(isNaN(sellPercent) || sellPercent<-100 || sellPercent>100){ alert("Vente % invalide"); return; }
-    savedSystems.push({name,economy,coordinates,buyPercent,sellPercent,notes});
-    saveSystems();
-    renderSystems();
-    showPage('systems');
-});
-
-function performSearch(){
-    const query=document.getElementById('searchInput').value.toLowerCase();
-    const resultSection=document.getElementById('resultSection');
-    if(!query){ resultSection.innerHTML=''; return; }
-    const matches=Object.keys(products).filter(p=>p.toLowerCase().includes(query));
-    if(matches.length===0){ resultSection.innerHTML='<div class="no-result">Aucun produit trouvé</div>'; return; }
-    const first=matches[0];
-    const prod=products[first];
-    resultSection.innerHTML=`<div class="system-card"><div><strong>${first}</strong></div>
-        <div>Économie: ${prod.economy}</div>
-        <div>Vendre à: ${prod.sellTo.join(", ")}</div>
-    </div>`;
-}
-
-function searchInSystems(){
-    const query=document.getElementById('productSearchInput').value.trim().toLowerCase();
-    const container=document.getElementById('comparisonResults');
-    if(!query){ container.innerHTML=''; return; }
-    const results=savedSystems.filter(s=>s.name.toLowerCase().includes(query));
-    if(results.length===0){ container.innerHTML='<div class="no-result">❌ Aucun système trouvé pour "'+query+'"</div>'; return; }
-    container.innerHTML=results.map(s=>`
-        <div class="system-card">
-            <div class="system-header">
-                <div>
-                    <div class="system-name">${s.name}</div>
-                    <div class="system-coords">${s.coordinates}</div>
-                </div>
-            </div>
-            <div style="color:#cbd5e1;">
-                <p>💰 Achat: ${s.buyPercent}% | Vente: ${s.sellPercent}%</p>
-                ${s.notes?`<p>📝 ${s.notes}</p>`:''}
-            </div>
-        </div>
-    `).join('');
-}
-
-generateStars();
-updateTexts();
-renderSystems();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
